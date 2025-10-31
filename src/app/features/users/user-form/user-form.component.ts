@@ -1,7 +1,7 @@
 import { Component, inject, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { User } from '../../store';
+import { User } from '../../../store';
 
 @Component({
   selector: 'app-user-form',

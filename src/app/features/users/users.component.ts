@@ -2,8 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsersStore, User } from '../../store';
-import { UsersListComponent } from './users-list.component';
-import { UserFormComponent } from './user-form.component';
+import { UsersListComponent } from './users-list/users-list.component';
+import { UserFormComponent } from './user-form/user-form.component';
 
 @Component({
   selector: 'app-users',
