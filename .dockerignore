@@ -22,7 +22,6 @@ Thumbs.db
 
 # Testing
 coverage
-*.spec.ts
 
 # Environment
 .env

@@ -1,14 +1,24 @@
 services:
-  # Angular frontend application
+  # Angular frontend application (development with live reload)
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: blog-frontend
     ports:
-      - "4200:80"
+      - "4200:4200"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+    volumes:
+      # Mount source code for live reload
+      - ./src:/app/src:delegated
+      - ./angular.json:/app/angular.json:delegated
+      - ./tsconfig.json:/app/tsconfig.json:delegated
+      - ./tsconfig.app.json:/app/tsconfig.app.json:delegated
+      - ./tsconfig.spec.json:/app/tsconfig.spec.json:delegated
+      - ./public:/app/public:delegated
+      # Prevent overwriting node_modules
+      - /app/node_modules
     restart: unless-stopped
     # On Mac/Windows, use extra_hosts to access host machine
     extra_hosts:

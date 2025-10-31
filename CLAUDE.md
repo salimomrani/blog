@@ -55,6 +55,23 @@ npm run lint:fix        # Auto-fix ESLint errors where possible
 ng lint --fix           # Same as npm run lint:fix
 ```
 
+### Docker Development
+```bash
+docker compose up --build         # Build and start containers with live reload
+docker compose up -d              # Start in detached mode
+docker compose down               # Stop and remove containers
+docker compose logs -f frontend   # Follow frontend logs
+docker compose restart frontend   # Restart frontend service
+```
+
+**Docker Live Reload Features:**
+- Automatically syncs source code changes (`src/`) to the container
+- Syncs configuration changes (angular.json, tsconfig files)
+- Angular dev server runs with polling for file change detection
+- Changes to source files trigger automatic reload in the browser
+- Accessible at http://localhost:4200
+- Uses volume mounting with `:delegated` for better performance on Mac/Windows
+
 ### Code Generation
 ```bash
 ng generate component component-name    # Generate new component
