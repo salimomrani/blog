@@ -12,7 +12,7 @@ This is an Angular 20.3 blog application using standalone components and Angular
 - **Angular Signals** - preferred reactivity primitive (already in use in src/app/app.ts:11)
 - **NgRx with Signal Store** - for complex state management (to be integrated)
 - **TypeScript 5.9** with strict mode enabled
-- **Jasmine + Karma** for testing
+- **Jest** for testing (with jest-preset-angular)
 
 ## Backend API
 
@@ -42,9 +42,9 @@ npm run watch           # Development build with watch mode
 
 ### Testing
 ```bash
-npm test                # Run all tests with Karma
-ng test                 # Same as npm test
-ng test --include='**/path/to/file.spec.ts'  # Run single test file
+npm test                # Run all tests with Jest
+npm run test:watch      # Run tests in watch mode
+npm run test:coverage   # Run tests with coverage report
 ```
 
 ### Linting
@@ -366,7 +366,9 @@ export class UsersService {
 export const UsersStore = signalStore(
   { providedIn: 'root' },
   withMethods((store, service = inject(UsersService)) => ({
-    load: rxMethod(() => service.getAll().pipe(...))
+    load: rxMethod(() => service.getAll().pipe(
+      
+    ))
   }))
 );
 
@@ -379,6 +381,6 @@ export class UsersComponent {
 // ❌ WRONG: Component with direct HTTP call
 export class UsersComponent {
   readonly http = inject(HttpClient); // ❌ NO!
-  ngOnInit() { this.http.get('api/users').subscribe(...); } // ❌ NO!
+  ngOnInit() { this.http.get('api/users').subscribe(); } // ❌ NO!
 }
 ```
