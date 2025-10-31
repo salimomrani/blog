@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [ 22.x ]
 
     steps:
       - name: Checkout code
@@ -69,10 +69,10 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-       - name: Push Docker image to Docker Hub
-         uses: docker/build-push-action@v5
-         with:
-           context: .
-           file: ./Dockerfile
-           push: true
-           tags: iconsultingdev/blog-frontend:latest
+      - name: Push Docker image to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: iconsultingdev/blog-frontend:latest
