@@ -30,8 +30,8 @@ describe('App', () => {
 
   it('should render the title in the logo', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const logoElement = compiled.querySelector('.logo');
-    expect(logoElement?.textContent).toContain('blog');
+    const logoElement = compiled.querySelector('a[routerLink="/home"]');
+    expect(logoElement?.textContent?.trim()).toContain('blog');
   });
 
   it('should contain a router-outlet', () => {
@@ -41,25 +41,25 @@ describe('App', () => {
 
   it('should render navigation with correct structure', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const nav = compiled.querySelector('nav.main-nav');
+    const nav = compiled.querySelector('nav');
     expect(nav).toBeTruthy();
 
-    const navContainer = nav?.querySelector('.nav-container');
+    const navContainer = nav?.querySelector('.container-custom');
     expect(navContainer).toBeTruthy();
 
-    const navLinks = navContainer?.querySelector('ul.nav-links');
+    const navLinks = navContainer?.querySelector('ul');
     expect(navLinks).toBeTruthy();
   });
 
   it('should have two navigation links', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const links = compiled.querySelectorAll('.nav-links li a');
+    const links = compiled.querySelectorAll('nav ul li a');
     expect(links.length).toBe(2);
   });
 
   it('should have "Accueil" link pointing to /home', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const homeLink = Array.from(compiled.querySelectorAll('.nav-links li a'))
+    const homeLink = Array.from(compiled.querySelectorAll('nav ul li a'))
       .find((link) => link.textContent?.trim() === 'Accueil') as HTMLAnchorElement;
 
     expect(homeLink).toBeTruthy();
@@ -68,7 +68,7 @@ describe('App', () => {
 
   it('should have "Utilisateurs" link pointing to /users', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const usersLink = Array.from(compiled.querySelectorAll('.nav-links li a'))
+    const usersLink = Array.from(compiled.querySelectorAll('nav ul li a'))
       .find((link) => link.textContent?.trim() === 'Utilisateurs') as HTMLAnchorElement;
 
     expect(usersLink).toBeTruthy();
@@ -77,7 +77,7 @@ describe('App', () => {
 
   it('should render main content area with router-outlet', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const mainContent = compiled.querySelector('main.main-content');
+    const mainContent = compiled.querySelector('main');
     expect(mainContent).toBeTruthy();
 
     const routerOutlet = mainContent?.querySelector('router-outlet');
@@ -86,7 +86,7 @@ describe('App', () => {
 
   it('should have logo link pointing to /home', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const logoLink = compiled.querySelector('.logo');
+    const logoLink = compiled.querySelector('nav a[routerLink="/home"]');
     expect(logoLink?.getAttribute('routerLink')).toBe('/home');
   });
 });
