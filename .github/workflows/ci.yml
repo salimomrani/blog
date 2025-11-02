@@ -117,6 +117,83 @@ jobs:
           kubectl cluster-info
           kubectl get nodes
 
+      - name: Install NGINX Ingress Controller
+        run: |
+          echo "==> Checking if NGINX Ingress Controller is already installed..."
+
+          # Check if the ingress-nginx namespace exists
+          if kubectl get namespace ingress-nginx &> /dev/null; then
+            echo "✓ NGINX Ingress Controller namespace already exists"
+
+            # Verify if the controller is running
+            if kubectl get deployment ingress-nginx-controller -n ingress-nginx &> /dev/null; then
+              echo "✓ NGINX Ingress Controller is already installed and running"
+
+              # Check the status
+              kubectl get pods -n ingress-nginx -l app.kubernetes.io/component=controller
+            else
+              echo "⚠ Namespace exists but controller not found. Reinstalling..."
+              kubectl delete namespace ingress-nginx --timeout=60s || true
+              sleep 5
+            fi
+          fi
+
+          # Install if not present
+          if ! kubectl get namespace ingress-nginx &> /dev/null; then
+            echo "==> Installing NGINX Ingress Controller for AWS..."
+
+            # Apply the official AWS manifest for NGINX Ingress Controller
+            kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/aws/deploy.yaml
+
+            echo "==> Waiting for NGINX Ingress Controller namespace to be created..."
+            kubectl wait --for=jsonpath='{.status.phase}'=Active namespace/ingress-nginx --timeout=60s
+
+            echo "==> Waiting for NGINX Ingress Controller pods to be ready..."
+            # Wait for the controller pod to be ready (5 minute timeout)
+            kubectl wait --namespace ingress-nginx \
+              --for=condition=ready pod \
+              --selector=app.kubernetes.io/component=controller \
+              --timeout=300s
+
+            echo "✓ NGINX Ingress Controller pods are ready"
+          fi
+
+          echo "==> Waiting for Load Balancer to be provisioned..."
+          # Wait up to 5 minutes for the LoadBalancer to get an external IP/hostname
+          SECONDS=0
+          MAX_WAIT=300
+
+          while [ $SECONDS -lt $MAX_WAIT ]; do
+            LB_HOSTNAME=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo "")
+            LB_IP=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+
+            if [ -n "$LB_HOSTNAME" ] || [ -n "$LB_IP" ]; then
+              echo "✓ Load Balancer is ready!"
+              if [ -n "$LB_HOSTNAME" ]; then
+                echo "  Hostname: $LB_HOSTNAME"
+              fi
+              if [ -n "$LB_IP" ]; then
+                echo "  IP: $LB_IP"
+              fi
+              break
+            fi
+
+            echo "  Waiting for Load Balancer... (${SECONDS}s elapsed)"
+            sleep 10
+          done
+
+          if [ $SECONDS -ge $MAX_WAIT ]; then
+            echo "⚠ Warning: Load Balancer took longer than expected to provision"
+            echo "  This may be normal for first-time setup. Continuing with deployment..."
+          fi
+
+          echo "==> NGINX Ingress Controller installation/verification completed"
+          echo ""
+          echo "Ingress Controller Status:"
+          kubectl get all -n ingress-nginx
+          echo ""
+          kubectl get service ingress-nginx-controller -n ingress-nginx
+
       - name: Apply Kubernetes manifests
         run: |
           echo "Applying Kubernetes manifests to kubevpro.i-consulting.shop cluster..."
