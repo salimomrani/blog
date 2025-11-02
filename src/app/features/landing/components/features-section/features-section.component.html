@@ -1,0 +1,37 @@
+<section class="py-20 bg-white">
+  <div class="container-custom">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-text mb-4">
+        Tout ce dont vous avez besoin
+      </h2>
+      <p class="text-lg text-secondary max-w-2xl mx-auto">
+        Une plateforme complète pour partager vos connaissances et apprendre de la communauté
+      </p>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (feature of features(); track feature.title) {
+        <div
+          class="group p-6 bg-background rounded-xl hover:shadow-xl transition-all duration-300 border-2 border-transparent hover:border-primary/20"
+        >
+          <!-- Icon -->
+          <div class="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+            {{ feature.icon }}
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-xl font-bold text-text mb-3">
+            {{ feature.title }}
+          </h3>
+
+          <!-- Description -->
+          <p class="text-secondary leading-relaxed">
+            {{ feature.description }}
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
