@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
+On every answer dont lot of details, be concise.
 ## Project Overview
 
 This is an Angular 20.3 blog application using standalone components and Angular Signals. The project is configured to use both Angular Signals and NgRx with signal integration for state management.
