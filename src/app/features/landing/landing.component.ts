@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, OnInit, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { Article } from '../../shared/models';
@@ -27,7 +27,6 @@ export class LandingComponent implements OnInit {
   protected readonly recentArticles = signal<Article[]>([]);
   protected readonly isLoading = signal<boolean>(true);
 
-  private readonly router = inject(Router);
 
   public ngOnInit(): void {
     this.loadRecentArticles();
