@@ -57,9 +57,9 @@ kubectl logs -l app=blog-frontend
 
 ### 5. Access the Application
 
-The application will be accessible at: `http://blog.kubevpro.i-consulting.shop`
+The application will be accessible at: `http://blog.i-consulting.shop`
 
-Make sure your DNS is configured to point `blog.kubevpro.i-consulting.shop` to your ingress controller's external IP.
+Make sure your DNS is configured to point `blog.i-consulting.shop` to your ingress controller's external IP.
 
 ```bash
 # Get ingress external IP
@@ -80,7 +80,7 @@ kubectl get ingress blog-frontend-ingress
 - **Port:** 80
 
 ### Ingress
-- **Host:** blog.kubevpro.i-consulting.shop
+- **Host:** blog.i-consulting.shop
 - **Path:** / (root path)
 - **Backend:** blog-frontend-service on port 80
 
