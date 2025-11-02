@@ -41,3 +41,16 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Kubernetes sensitive files
+*kubeconfig*
+*.kubeconfig
+kube-config
+.kube/
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+secrets.yaml
+secrets.yml
