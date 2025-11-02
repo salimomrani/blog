@@ -1,21 +1,34 @@
-<nav class="main-nav">
-  <div class="nav-container">
-    <a routerLink="/home" class="logo">{{ title() }} </a>
-    <ul class="nav-links">
-      <li>
-        <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-          Accueil
-        </a>
-      </li>
-      <li>
-        <a routerLink="/users" routerLinkActive="active">
-          Utilisateurs
-        </a>
-      </li>
-    </ul>
+<nav class="bg-white shadow-md">
+  <div class="container-custom py-4">
+    <div class="flex items-center justify-between">
+      <a routerLink="/home" class="text-2xl font-bold text-primary">
+        {{ title() }}
+      </a>
+      <ul class="flex gap-6">
+        <li>
+          <a
+            routerLink="/home"
+            routerLinkActive="text-primary font-semibold"
+            [routerLinkActiveOptions]="{exact: true}"
+            class="text-secondary hover:text-primary transition-colors"
+          >
+            Accueil
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/users"
+            routerLinkActive="text-primary font-semibold"
+            class="text-secondary hover:text-primary transition-colors"
+          >
+            Utilisateurs
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 
-<main class="main-content">
+<main class="container-custom py-8">
   <router-outlet />
 </main>
