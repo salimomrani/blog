@@ -82,3 +82,79 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: iconsultingdev/blog-frontend:latest
+
+  # Job 3: Deploy to Kubernetes (only on push to master/main after Docker image is built)
+  deploy-to-kubernetes:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.29.0'
+
+      - name: Configure kubectl with kubeconfig
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          # Create .kube directory
+          mkdir -p $HOME/.kube
+
+          # Decode base64 kubeconfig and save to file
+          echo "$KUBE_CONFIG_DATA" | base64 --decode > $HOME/.kube/config
+
+          # Set proper permissions
+          chmod 600 $HOME/.kube/config
+
+          # Verify connection to cluster
+          echo "Verifying connection to Kubernetes cluster..."
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Apply Kubernetes manifests
+        run: |
+          echo "Applying Kubernetes manifests to kubevpro.i-consulting.shop cluster..."
+
+          # Apply manifests in order: service, deployment, ingress
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/ingress.yaml
+
+          echo "Manifests applied successfully"
+
+      - name: Restart deployment to pull latest image
+        run: |
+          echo "Restarting deployment to pull latest Docker image..."
+
+          # Restart the deployment to pull the latest image
+          kubectl rollout restart deployment/blog-frontend
+
+          # Wait for rollout to complete (timeout after 5 minutes)
+          kubectl rollout status deployment/blog-frontend --timeout=5m
+
+          echo "Deployment rollout completed successfully"
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment status..."
+
+          # Get deployment status
+          kubectl get deployment blog-frontend
+
+          # Get pod status
+          kubectl get pods -l app=blog-frontend
+
+          # Get service status
+          kubectl get service blog-frontend-service
+
+          # Get ingress status
+          kubectl get ingress blog-frontend-ingress
+
+          echo "Deployment verification completed"
+          echo "Application should be accessible at: http://blog.kubevpro.i-consulting.shop"
