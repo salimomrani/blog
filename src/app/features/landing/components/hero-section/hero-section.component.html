@@ -1,0 +1,59 @@
+<section class="relative bg-gradient-to-br from-primary/5 via-background to-accent/5 py-20 md:py-32">
+  <div class="container-custom">
+    <div class="max-w-4xl mx-auto text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm mb-8">
+        <span class="text-2xl">📰</span>
+        <span class="text-sm font-medium text-secondary">Plateforme communautaire</span>
+      </div>
+
+      <!-- Titre principal -->
+      <h1 class="text-4xl md:text-6xl font-bold text-text mb-6 leading-tight">
+        Partagez vos idées,
+        <span class="text-primary">apprenez des autres</span>
+      </h1>
+
+      <!-- Description -->
+      <p class="text-lg md:text-xl text-secondary mb-10 max-w-2xl mx-auto">
+        Rejoignez une communauté de développeurs passionnés. Écrivez, lisez et commentez des articles techniques
+        en toute simplicité.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button
+          (click)="handleStartWriting()"
+          class="px-8 py-4 bg-primary text-white font-semibold rounded-lg shadow-lg hover:bg-primary/90 transform hover:scale-105 transition-all duration-200"
+        >
+          ✍️ Commencer à écrire
+        </button>
+        <button
+          (click)="handleDiscoverArticles()"
+          class="px-8 py-4 bg-white text-primary font-semibold rounded-lg shadow-md hover:shadow-lg border-2 border-primary/20 hover:border-primary/40 transition-all duration-200"
+        >
+          🔍 Découvrir les articles
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">1.2K+</div>
+          <div class="text-sm text-secondary mt-1">Articles publiés</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">500+</div>
+          <div class="text-sm text-secondary mt-1">Contributeurs</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-primary">10K+</div>
+          <div class="text-sm text-secondary mt-1">Lecteurs mensuels</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decoration -->
+  <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+  <div class="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10"></div>
+</section>

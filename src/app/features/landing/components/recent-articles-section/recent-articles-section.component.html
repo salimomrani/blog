@@ -1,0 +1,106 @@
+<section class="py-20 bg-gradient-to-b from-background to-white">
+  <div class="container-custom">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-12">
+      <div>
+        <h2 class="text-3xl md:text-4xl font-bold text-text mb-2">
+          📚 Articles récents
+        </h2>
+        <p class="text-lg text-secondary">
+          Découvrez les dernières publications de notre communauté
+        </p>
+      </div>
+      <button
+        (click)="handleViewAll()"
+        class="hidden md:block px-6 py-3 text-primary font-semibold hover:bg-primary/5 rounded-lg transition-colors"
+      >
+        Voir tous les articles →
+      </button>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      @for (article of articles(); track article.id) {
+        <article
+          (click)="handleArticleClick(article)"
+          (keydown.enter)="handleArticleClick(article)"
+          tabindex="0"
+          class="group bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer border border-transparent hover:border-primary/20"
+        >
+          <!-- Cover Image -->
+          @if (article.coverImageUrl) {
+            <div class="relative h-48 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+              <img
+                [src]="article.coverImageUrl"
+                [alt]="article.title"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+              <!-- Overlay on hover -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+          }
+
+          <!-- Content -->
+          <div class="p-6">
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-2 mb-3">
+              @for (tag of article.tags.slice(0, 3); track tag) {
+                <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
+                  {{ tag }}
+                </span>
+              }
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-xl font-bold text-text mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+              {{ article.title }}
+            </h3>
+
+            <!-- Excerpt -->
+            <p class="text-secondary text-sm mb-4 line-clamp-3">
+              {{ article.excerpt }}
+            </p>
+
+            <!-- Footer -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+              <!-- Author -->
+              <div class="flex items-center gap-3">
+                <img
+                  [src]="article.author.avatarUrl"
+                  [alt]="article.author.username"
+                  class="w-8 h-8 rounded-full"
+                />
+                <div class="flex flex-col">
+                  <span class="text-sm font-medium text-text">{{ article.author.username }}</span>
+                  <span class="text-xs text-secondary">{{ formatDate(article.createdAt) }}</span>
+                </div>
+              </div>
+
+              <!-- Stats -->
+              <div class="flex items-center gap-4 text-secondary text-sm">
+                <div class="flex items-center gap-1">
+                  <span>❤️</span>
+                  <span>{{ article.likes }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span>💬</span>
+                  <span>{{ article.commentsCount }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <!-- View All Button (Mobile) -->
+    <div class="mt-12 text-center md:hidden">
+      <button
+        (click)="handleViewAll()"
+        class="w-full px-6 py-4 bg-primary text-white font-semibold rounded-lg shadow-lg hover:bg-primary/90 transition-colors"
+      >
+        Voir tous les articles →
+      </button>
+    </div>
+  </div>
+</section>
