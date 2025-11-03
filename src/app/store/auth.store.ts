@@ -38,14 +38,7 @@ export const AuthStore = signalStore(
             accessToken: res.data.accessToken,
             refreshToken: res.data.refreshToken ?? null
           })),
-          tap((res: AuthResponseDto) => {
-            try {
-              localStorage.setItem('accessToken', res.data.accessToken);
-              if (res.data.refreshToken) {
-                localStorage.setItem('refreshToken', res.data.refreshToken);
-              }
-            } catch {}
-          }),
+          
           switchMap(() => authService.me()),
           tap((user: UserProfileDto) => patchState(store, { user, isLoading: false })),
           catchError((error) => {
@@ -60,12 +53,7 @@ export const AuthStore = signalStore(
       patchState(store, { isLoading: true, error: null });
       return authService.logout().pipe(
         tap(() => patchState(store, { user: null, accessToken: null, refreshToken: null, isLoading: false })),
-        tap(() => {
-          try {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-          } catch {}
-        }),
+        
         catchError((error) => {
           patchState(store, { error: error?.message ?? 'Logout failed', isLoading: false, user: null, accessToken: null, refreshToken: null });
           return EMPTY;
