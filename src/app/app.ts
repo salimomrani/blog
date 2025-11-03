@@ -16,7 +16,7 @@ export class App {
   protected onLogout(): void {
     this.authStore.logout().subscribe({
       next: () => {
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(['/home']);
       }
     });
   }
