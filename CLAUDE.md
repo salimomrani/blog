@@ -3,6 +3,18 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 On every answer dont lot of details, be concise.
 
+## 📖 Best Practices Reference
+
+**IMPORTANT:** Follow universal best practices defined in `BEST_PRACTICES.md`:
+- Commit message conventions
+- Code quality standards (SOLID, DRY, KISS, YAGNI)
+- Testing principles
+- Security guidelines
+- Performance optimization
+- Code review practices
+
+**Note:** BEST_PRACTICES.md contains technology-agnostic guidelines applicable to any project.
+
 ## Git & Pull Request Policy
 
 **IMPORTANT - Pull Request Management:**
