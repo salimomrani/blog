@@ -10,6 +10,15 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
+  {
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+      }
+    ]
+  },
   // TODO: Add users routes when implemented
   // {
   //   path: 'users',
