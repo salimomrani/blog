@@ -5,7 +5,7 @@
         <span class="text-3xl">📰</span>
         {{ title() }}
       </a>
-      <ul class="flex gap-6">
+      <ul class="flex gap-6 items-center">
         <li>
           <a
             routerLink="/home"
@@ -16,7 +16,36 @@
             🏠 Accueil
           </a>
         </li>
-        <!-- TODO: Add more navigation links when features are implemented -->
+        @if (!authStore.isAuthenticated()) {
+          <li>
+            <a
+              routerLink="/auth/login"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors"
+            >
+              🔐 Connexion
+            </a>
+          </li>
+        }
+        @if (authStore.isAuthenticated()) {
+          <li>
+            <a
+              routerLink="/profile"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors"
+            >
+              👤 {{ authStore.fullName() || 'Profil' }}
+            </a>
+          </li>
+          <li>
+            <button
+              (click)="onLogout()"
+              class="text-secondary hover:text-red-600 transition-colors font-medium"
+            >
+              🚪 Déconnexion
+            </button>
+          </li>
+        }
       </ul>
     </div>
   </div>
