@@ -6,8 +6,8 @@ import { Injectable } from '@angular/core';
  */
 @Injectable({ providedIn: 'root' })
 export class StorageService {
-  private readonly accessTokenKey = 'access_token';
-  private readonly refreshTokenKey = 'refresh_token';
+  private readonly accessTokenKey = 'accessToken';
+  private readonly refreshTokenKey = 'refreshToken';
 
   /**
    * Store access token in localStorage
