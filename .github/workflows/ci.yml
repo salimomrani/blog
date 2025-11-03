@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master, main ]
 
+env:
+  CERT_MANAGER_VERSION: v1.14.0
+
 jobs:
   # Job 1: Lint, Test, and Build
   build-and-test:
@@ -98,6 +101,11 @@ jobs:
         uses: azure/setup-kubectl@v4
         with:
           version: 'v1.29.0'
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
 
       - name: Configure kubectl with kubeconfig
         env:
@@ -194,6 +202,43 @@ jobs:
           echo ""
           kubectl get service ingress-nginx-controller -n ingress-nginx
 
+      - name: Add cert-manager Helm repository
+        run: |
+          helm repo add jetstack https://charts.jetstack.io
+          helm repo update
+
+      - name: Install/Upgrade cert-manager
+        run: |
+          if kubectl get namespace cert-manager &> /dev/null; then
+            echo "Upgrading cert-manager..."
+            helm upgrade cert-manager jetstack/cert-manager \
+              --namespace cert-manager \
+              --version ${{ env.CERT_MANAGER_VERSION }} \
+              --set installCRDs=true \
+              --wait
+          else
+            echo "Installing cert-manager..."
+            helm install cert-manager jetstack/cert-manager \
+              --namespace cert-manager \
+              --create-namespace \
+              --version ${{ env.CERT_MANAGER_VERSION }} \
+              --set installCRDs=true \
+              --wait
+          fi
+
+      - name: Wait for cert-manager to be ready
+        run: |
+          kubectl wait --for=condition=ready pod \
+            -l app.kubernetes.io/instance=cert-manager \
+            -n cert-manager \
+            --timeout=180s
+
+      - name: Deploy ClusterIssuer
+        run: |
+          kubectl apply -f k8s/01-cluster-issuer-letsencrypt.yaml
+          sleep 5
+          kubectl get clusterissuer
+
       - name: Apply Kubernetes manifests
         run: |
           echo "Applying Kubernetes manifests to kubevpro.i-consulting.shop cluster..."
@@ -217,21 +262,61 @@ jobs:
 
           echo "Deployment rollout completed successfully"
 
-      - name: Verify deployment
+      - name: Wait for certificate issuance
         run: |
-          echo "Verifying deployment status..."
+          echo "Waiting for SSL certificate to be issued..."
+          for i in {1..24}; do
+            if kubectl get certificate blog-frontend-tls-cert &> /dev/null; then
+              CERT_READY=$(kubectl get certificate blog-frontend-tls-cert -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "False")
 
-          # Get deployment status
+              if [ "$CERT_READY" == "True" ]; then
+                echo "✅ Certificate is ready!"
+                kubectl get certificate blog-frontend-tls-cert
+                exit 0
+              fi
+
+              echo "Attempt $i/24: Certificate not ready yet (status: $CERT_READY)"
+            else
+              echo "Attempt $i/24: Certificate resource not found yet"
+            fi
+
+            sleep 10
+          done
+
+          echo "⚠️ Certificate not ready after 4 minutes"
+          kubectl describe certificate blog-frontend-tls-cert || true
+          exit 1
+
+      - name: Verify deployment
+        if: always()
+        run: |
+          echo "========================================="
+          echo "Deployment Summary"
+          echo "========================================="
+          echo ""
+          echo "Cert-manager pods:"
+          kubectl get pods -n cert-manager
+          echo ""
+          echo "ClusterIssuers:"
+          kubectl get clusterissuer
+          echo ""
+          echo "Certificates:"
+          kubectl get certificate
+          echo ""
+          echo "Deployment:"
           kubectl get deployment blog-frontend
-
-          # Get pod status
+          echo ""
+          echo "Pods:"
           kubectl get pods -l app=blog-frontend
-
-          # Get service status
+          echo ""
+          echo "Service:"
           kubectl get service blog-frontend-service
-
-          # Get ingress status
+          echo ""
+          echo "Ingress:"
           kubectl get ingress blog-frontend-ingress
-
-          echo "Deployment verification completed"
-          echo "Application should be accessible at: http://blog.kubevpro.i-consulting.shop"
+          echo ""
+          echo "========================================="
+          echo "Application URLs:"
+          echo "  HTTP:  http://blog.kubevpro.i-consulting.shop"
+          echo "  HTTPS: https://blog.kubevpro.i-consulting.shop"
+          echo "========================================="
