@@ -1,5 +1,7 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { App } from './app';
 import { RouterOutlet } from '@angular/router';
 import { By } from '@angular/platform-browser';
@@ -15,7 +17,9 @@ describe('App', () => {
         provideRouter([
           { path: 'home', component: App },
           { path: 'users', component: App }
-        ])
+        ]),
+        provideHttpClient(),
+        provideHttpClientTesting()
       ]
     }).compileComponents();
 

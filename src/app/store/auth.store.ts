@@ -15,17 +15,21 @@ export interface AuthState {
   error: string | null;
 }
 
-const initialState: AuthState = {
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-  isLoading: false,
-  error: null
-};
+// Initialize state with tokens from localStorage
+function getInitialState(): AuthState {
+  const storageService = inject(StorageService);
+  return {
+    user: null,
+    accessToken: storageService.getAccessToken(),
+    refreshToken: storageService.getRefreshToken(),
+    isLoading: false,
+    error: null
+  };
+}
 
 export const AuthStore = signalStore(
   { providedIn: 'root' },
-  withState<AuthState>(initialState),
+  withState<AuthState>(getInitialState),
   withComputed((state) => ({
     isAuthenticated: computed(() => !!state.accessToken()),
     fullName: computed(() => state.user()?.fullName ?? null),
@@ -162,16 +166,13 @@ export const AuthStore = signalStore(
   })),
   withHooks({
     onInit(store) {
-      // Restore tokens from localStorage on initialization
-      const storageService = inject(StorageService);
-      const accessToken = storageService.getAccessToken();
-      const refreshToken = storageService.getRefreshToken();
-
-      if (accessToken) {
-        patchState(store, { accessToken, refreshToken });
-        // Load user profile if token exists
-        store.loadUserProfile();
-      }
+      // Defer profile loading to avoid circular dependency
+      // Store is fully initialized at this point, but we need to wait for the microtask queue
+      queueMicrotask(() => {
+        if (store.accessToken()) {
+          store.loadUserProfile();
+        }
+      });
     }
   })
 );
