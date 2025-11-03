@@ -3,8 +3,8 @@
 
   <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
     <div>
-      <label class="block text-sm font-medium mb-1">Email</label>
-      <input type="email" formControlName="email" class="w-full border rounded px-3 py-2" />
+      <label for="email" class="block text-sm font-medium mb-1">Email</label>
+      <input type="email" formControlName="email" class="w-full border rounded px-3 py-2" id="email"/>
       @if (form.controls.email.touched && form.controls.email.invalid) {
       <div class="text-red-600 text-sm mt-1">
         Un email valide est requis.
@@ -13,8 +13,8 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium mb-1">Mot de passe</label>
-      <input type="password" formControlName="password" class="w-full border rounded px-3 py-2" />
+      <label for="password" class="block text-sm font-medium mb-1">Mot de passe</label>
+      <input type="password" formControlName="password" class="w-full border rounded px-3 py-2" id="password" />
       @if (form.controls.password.touched && form.controls.password.invalid) {
       <div class="text-red-600 text-sm mt-1">
         Le mot de passe est requis (6+ caractères).

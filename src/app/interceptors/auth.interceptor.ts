@@ -7,6 +7,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authStore.accessToken();
 
   if (token) {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
   }
 
