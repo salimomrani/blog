@@ -13,6 +13,12 @@ On every answer dont lot of details, be concise.
 - ✅ Create pull requests with `--delete-branch` option for auto-deletion after merge
 - ❌ **DO NOT merge, rebase, or squash PRs** - Always wait for owner approval
 
+**Branch Workflow:**
+- ❌ **NEVER push directly to master** - Always work in feature branches
+- ✅ Always create a feature branch for any change: `feature/`, `fix/`, `refactor/`, etc.
+- ✅ Create a pull request for every change - no direct commits to master
+- ✅ Branch naming convention: `feature/description`, `fix/issue-name`, `refactor/component-name`
+
 **Branch Management:**
 - When creating PRs, use: `gh pr create --title "..." --body "..." --delete-branch`
 - This ensures branches are automatically deleted after the owner merges the PR
