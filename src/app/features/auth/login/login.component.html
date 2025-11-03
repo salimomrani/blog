@@ -25,8 +25,14 @@
     <button type="submit" class="bg-primary text-white px-4 py-2 rounded w-full">Se connecter</button>
   </form>
 
-  <div class="mt-4 text-sm">
-    <a routerLink="/home" class="text-primary">Retour à l'accueil</a>
+  <div class="mt-4 text-sm space-y-2">
+    <div>
+      Pas encore de compte ?
+      <a routerLink="/auth/register" class="text-primary hover:underline">S'inscrire</a>
+    </div>
+    <div>
+      <a routerLink="/home" class="text-primary hover:underline">Retour à l'accueil</a>
+    </div>
   </div>
 </div>
 

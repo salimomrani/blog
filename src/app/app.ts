@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, signal, inject } from '@angular/core';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthStore } from './store/auth.store';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,14 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 })
 export class App {
   readonly title = signal('blog');
+  protected readonly authStore = inject(AuthStore);
+  private readonly router = inject(Router);
+
+  protected onLogout(): void {
+    this.authStore.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/login']);
+      }
+    });
+  }
 }

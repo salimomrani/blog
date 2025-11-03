@@ -1,13 +1,14 @@
 import { inject } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState, withHooks } from '@ngrx/signals';
 import { computed } from '@angular/core';
-import { AuthService, AuthResponseDto, UserProfileDto } from '../services/auth.service';
+import { AuthService, UserDto, RegisterRequestDto, ApiResponseAuthResponse, ApiResponseUserDto } from '../services/auth.service';
+import { StorageService } from '../services/storage.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { Observable, EMPTY, pipe } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 
 export interface AuthState {
-  user: UserProfileDto | null;
+  user: UserDto | null;
   accessToken: string | null;
   refreshToken: string | null;
   isLoading: boolean;
@@ -27,22 +28,74 @@ export const AuthStore = signalStore(
   withState<AuthState>(initialState),
   withComputed((state) => ({
     isAuthenticated: computed(() => !!state.accessToken()),
-    username: computed(() => state.user()?.username ?? null)
+    fullName: computed(() => state.user()?.fullName ?? null),
+    firstName: computed(() => state.user()?.firstName ?? null)
   })),
-  withMethods((store, authService = inject(AuthService)) => ({
+  withMethods((store, authService = inject(AuthService), storageService = inject(StorageService)) => ({
     login: rxMethod<{ email: string; password: string }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),
         switchMap((credentials) => authService.login(credentials).pipe(
-          tap((res: AuthResponseDto) => patchState(store, {
-            accessToken: res.data.accessToken,
-            refreshToken: res.data.refreshToken ?? null
-          })),
-          
-          switchMap(() => authService.me()),
-          tap((user: UserProfileDto) => patchState(store, { user, isLoading: false })),
+          tap((response: ApiResponseAuthResponse) => {
+            if (!response.success) {
+              throw new Error(response.message);
+            }
+
+            const { accessToken, refreshToken, user } = response.data;
+
+            // Save tokens to localStorage
+            storageService.setAccessToken(accessToken);
+            if (refreshToken) {
+              storageService.setRefreshToken(refreshToken);
+            }
+
+            // Update store state with user data directly from login response
+            patchState(store, {
+              accessToken,
+              refreshToken: refreshToken ?? null,
+              user,
+              isLoading: false
+            });
+          }),
           catchError((error) => {
-            patchState(store, { error: error?.message ?? 'Login failed', isLoading: false });
+            storageService.clearTokens();
+            const errorMessage = error?.error?.message ?? error?.message ?? 'Login failed';
+            patchState(store, { error: errorMessage, isLoading: false });
+            return EMPTY;
+          })
+        ))
+      )
+    ),
+
+    register: rxMethod<RegisterRequestDto>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true, error: null })),
+        switchMap((payload) => authService.register(payload).pipe(
+          tap((response: ApiResponseAuthResponse) => {
+            if (!response.success) {
+              throw new Error(response.message);
+            }
+
+            const { accessToken, refreshToken, user } = response.data;
+
+            // Save tokens to localStorage
+            storageService.setAccessToken(accessToken);
+            if (refreshToken) {
+              storageService.setRefreshToken(refreshToken);
+            }
+
+            // Update store state with user data directly from register response
+            patchState(store, {
+              accessToken,
+              refreshToken: refreshToken ?? null,
+              user,
+              isLoading: false
+            });
+          }),
+          catchError((error) => {
+            storageService.clearTokens();
+            const errorMessage = error?.error?.message ?? error?.message ?? 'Registration failed';
+            patchState(store, { error: errorMessage, isLoading: false });
             return EMPTY;
           })
         ))
@@ -52,15 +105,74 @@ export const AuthStore = signalStore(
     logout(): Observable<void> {
       patchState(store, { isLoading: true, error: null });
       return authService.logout().pipe(
-        tap(() => patchState(store, { user: null, accessToken: null, refreshToken: null, isLoading: false })),
-        
+        tap(() => {
+          // Clear tokens from localStorage
+          storageService.clearTokens();
+
+          // Clear store state
+          patchState(store, { user: null, accessToken: null, refreshToken: null, isLoading: false });
+        }),
         catchError((error) => {
-          patchState(store, { error: error?.message ?? 'Logout failed', isLoading: false, user: null, accessToken: null, refreshToken: null });
+          // Clear tokens even if API call fails
+          storageService.clearTokens();
+          patchState(store, {
+            error: error?.message ?? 'Logout failed',
+            isLoading: false,
+            user: null,
+            accessToken: null,
+            refreshToken: null
+          });
           return EMPTY;
         })
       );
-    }
-  }))
-);
+    },
 
+    /**
+     * Load user profile if token exists (on app init)
+     */
+    loadUserProfile(): void {
+      const token = store.accessToken();
+      if (!token) {
+        return;
+      }
+
+      patchState(store, { isLoading: true, error: null });
+      authService.me().pipe(
+        tap((response: ApiResponseUserDto) => {
+          if (!response.success) {
+            throw new Error(response.message);
+          }
+          patchState(store, { user: response.data, isLoading: false });
+        }),
+        catchError((error) => {
+          // If user profile fails to load, clear tokens (likely expired)
+          storageService.clearTokens();
+          const errorMessage = error?.error?.message ?? error?.message ?? 'Session expired';
+          patchState(store, {
+            error: errorMessage,
+            isLoading: false,
+            user: null,
+            accessToken: null,
+            refreshToken: null
+          });
+          return EMPTY;
+        })
+      ).subscribe();
+    }
+  })),
+  withHooks({
+    onInit(store) {
+      // Restore tokens from localStorage on initialization
+      const storageService = inject(StorageService);
+      const accessToken = storageService.getAccessToken();
+      const refreshToken = storageService.getRefreshToken();
+
+      if (accessToken) {
+        patchState(store, { accessToken, refreshToken });
+        // Load user profile if token exists
+        store.loadUserProfile();
+      }
+    }
+  })
+);
 
