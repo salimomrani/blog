@@ -2,6 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 On every answer dont lot of details, be concise.
+
+## Git & Pull Request Policy
+
+**IMPORTANT - Pull Request Management:**
+- ❌ **NEVER merge pull requests** - Only the repository owner merges PRs
+- ✅ Create feature branches
+- ✅ Commit changes
+- ✅ Push to remote
+- ✅ Create pull requests with `--delete-branch` option for auto-deletion after merge
+- ❌ **DO NOT merge, rebase, or squash PRs** - Always wait for owner approval
+
+**Branch Management:**
+- When creating PRs, use: `gh pr create --title "..." --body "..." --delete-branch`
+- This ensures branches are automatically deleted after the owner merges the PR
+- Only keep `master` branch - delete all feature branches after merge
+
 ## Project Overview
 
 This is an Angular 20.3 blog application using standalone components and Angular Signals. The project is configured to use both Angular Signals and NgRx with signal integration for state management.
