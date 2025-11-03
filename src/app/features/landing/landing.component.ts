@@ -25,7 +25,7 @@ import { CtaSectionComponent } from './components/cta-section/cta-section.compon
 })
 export class LandingComponent implements OnInit {
   protected readonly recentArticles = signal<Article[]>([]);
-  protected readonly isLoading = signal<boolean>(true);
+  protected readonly isLoading = signal(true);
 
 
   public ngOnInit(): void {
