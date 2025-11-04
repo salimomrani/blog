@@ -2,17 +2,20 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../store/articles.store';
+import { AuthStore } from '../../store/auth.store';
+import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, IsAuthorPipe],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArticleDetailComponent implements OnInit {
   readonly articlesStore = inject(ArticlesStore);
+  readonly authStore = inject(AuthStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
