@@ -54,11 +54,28 @@ export const routes: Routes = [
       }
     ]
   },
-  // TODO: Add users routes when implemented
-  // {
-  //   path: 'users',
-  //   loadChildren: () => import('./features/users/users.routes').then(m => m.USERS_ROUTES)
-  // },
+  {
+    path: 'users',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/users/users-list.component').then(m => m.UsersListComponent)
+      },
+      {
+        path: 'new',
+        loadComponent: () => import('./features/users/user-form.component').then(m => m.UserFormComponent)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/users/user-detail.component').then(m => m.UserDetailComponent)
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () => import('./features/users/user-form.component').then(m => m.UserFormComponent)
+      }
+    ]
+  },
   {
     path: '**',
     redirectTo: 'home'
