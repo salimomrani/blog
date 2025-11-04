@@ -133,7 +133,7 @@ jobs:
           mkdir -p $HOME/.kube
 
           # Export kubeconfig from kOps (reads from S3)
-          kops export kubeconfig "${KOPS_CLUSTER_NAME}" --state="${KOPS_STATE_STORE}" --admin
+          kops export kubeconfig --admin
 
           # Verify connection to cluster
           echo "Verifying connection to Kubernetes cluster..."
