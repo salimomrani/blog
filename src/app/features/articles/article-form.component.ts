@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -26,21 +26,25 @@ export class ArticleFormComponent implements OnInit {
   protected isEditMode = false;
   protected articleId: number | null = null;
 
+  constructor() {
+    // Effect to populate form when selectedArticle changes
+    effect(() => {
+      const article = this.articlesStore.selectedArticle();
+      if (article && this.isEditMode) {
+        this.form.patchValue({
+          title: article.title,
+          content: article.content
+        });
+      }
+    });
+  }
+
   public ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.articleId = Number(id);
       this.articlesStore.loadArticleById(this.articleId);
-
-      // Populate form when article is loaded
-      const article = this.articlesStore.selectedArticle();
-      if (article) {
-        this.form.patchValue({
-          title: article.title,
-          content: article.content
-        });
-      }
     }
   }
 
