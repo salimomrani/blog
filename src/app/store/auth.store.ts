@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState, withHooks } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState, withHooks, withProps } from '@ngrx/signals';
 import { computed } from '@angular/core';
 import { AuthService, UserDto, RegisterRequestDto, ApiResponseAuthResponse, ApiResponseUserDto } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
@@ -30,12 +30,17 @@ function getInitialState(): AuthState {
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState<AuthState>(getInitialState),
+  withProps(()=>({
+    authService : inject(AuthService),
+    storageService : inject(StorageService)
+    })),
   withComputed((state) => ({
     isAuthenticated: computed(() => !!state.accessToken()),
     fullName: computed(() => state.user()?.fullName ?? null),
     firstName: computed(() => state.user()?.firstName ?? null)
   })),
-  withMethods((store, authService = inject(AuthService), storageService = inject(StorageService)) => ({
+  withMethods(( {authService, storageService, ...store} ) => ({
+
     login: rxMethod<{ email: string; password: string }>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null })),

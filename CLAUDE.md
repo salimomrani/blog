@@ -218,18 +218,22 @@ NgRx packages installed and configured (v20.1.0):
 
 **Signal Store Pattern:**
 - Use `signalStore()` with `{ providedIn: 'root' }` for global stores
-- Combine `withState()`, `withComputed()`, and `withMethods()` to build stores
+- Combine `withState()`, `withProps()`, `withComputed()`, and `withMethods()` to build stores
+- **ALWAYS use `withProps()` to inject services** - this provides cleaner service dependency management
 - Use `rxMethod()` for async operations
 - **Inject services into stores** - stores should call services, not HttpClient directly
 - Inject stores directly in components via `inject(PostsStore)` or `inject(UsersStore)`
 - Stores orchestrate service calls and manage state
 
-**Store Pattern with Services:**
+**Store Pattern with Services (using withProps):**
 ```typescript
 export const UsersStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((store, usersService = inject(UsersService)) => ({
+  withProps(() => ({
+    usersService: inject(UsersService)
+  })),
+  withMethods(({ usersService, ...store }) => ({
     loadUsers: rxMethod<void>(
       pipe(
         tap(() => patchState(store, { isLoading: true })),
@@ -245,6 +249,12 @@ export const UsersStore = signalStore(
   }))
 );
 ```
+
+**Why use `withProps()` for service injection:**
+- Services are defined once and reused across all methods
+- Cleaner separation between store state and injected dependencies
+- More maintainable when working with multiple services
+- Easier to destructure in `withMethods()`: `({ service1, service2, ...store })`
 
 ### TypeScript Configuration
 - **Strict mode enabled** - all strict type checking flags are on
@@ -392,10 +402,11 @@ The project uses Prettier with these settings:
 
 ### When Creating Stores
 1. ✅ Create stores in `src/app/store/`
-2. ✅ **Inject services into stores** - use services for HTTP
-3. ✅ Use `rxMethod()` for async operations
-4. ✅ Manage state, loading, and error states
-5. ❌ **NEVER inject HttpClient directly in stores** - use services instead
+2. ✅ **ALWAYS use `withProps()` to inject services** - cleaner dependency management
+3. ✅ **Inject services into stores** - use services for HTTP
+4. ✅ Use `rxMethod()` for async operations
+5. ✅ Manage state, loading, and error states
+6. ❌ **NEVER inject HttpClient directly in stores** - use services instead
 
 ### Architecture Flow
 ```
@@ -413,12 +424,16 @@ export class UsersService {
   getAll() { return this.http.get<User[]>('api/users'); }
 }
 
-// ✅ CORRECT: Store uses service
+// ✅ CORRECT: Store uses service with withProps
 export const UsersStore = signalStore(
   { providedIn: 'root' },
-  withMethods((store, service = inject(UsersService)) => ({
-    load: rxMethod(() => service.getAll().pipe(
-      
+  withState(initialState),
+  withProps(() => ({
+    usersService: inject(UsersService)
+  })),
+  withMethods(({ usersService, ...store }) => ({
+    load: rxMethod(() => usersService.getAll().pipe(
+      tap((users) => patchState(store, { users }))
     ))
   }))
 );
