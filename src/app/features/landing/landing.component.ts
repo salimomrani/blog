@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 import { Article } from '../../shared/models';
 import { MOCK_ARTICLES } from './mocks/articles.mock';
@@ -24,6 +25,8 @@ import { CtaSectionComponent } from './components/cta-section/cta-section.compon
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LandingComponent implements OnInit {
+  private readonly router = inject(Router);
+
   protected readonly recentArticles = signal<Article[]>([]);
   protected readonly isLoading = signal(true);
 
@@ -48,32 +51,22 @@ export class LandingComponent implements OnInit {
   }
 
   protected handleStartWriting(): void {
-    console.log('Navigate to: /articles/new');
-    // TODO: Navigate to article editor when implemented
-    // this.router.navigate(['/articles', 'new']);
+    this.router.navigate(['/articles', 'new']);
   }
 
   protected handleDiscoverArticles(): void {
-    console.log('Navigate to: /articles');
-    // TODO: Navigate to articles list when implemented
-    // this.router.navigate(['/articles']);
+    this.router.navigate(['/articles']);
   }
 
   protected handleArticleClick(article: Article): void {
-    console.log('Navigate to article:', article.slug);
-    // TODO: Navigate to article detail when implemented
-    // this.router.navigate(['/articles', article.slug]);
+    this.router.navigate(['/articles', article.id]);
   }
 
   protected handleViewAllArticles(): void {
-    console.log('Navigate to: /articles');
-    // TODO: Navigate to articles list when implemented
-    // this.router.navigate(['/articles']);
+    this.router.navigate(['/articles']);
   }
 
   protected handleSignUp(): void {
-    console.log('Navigate to: /auth/register');
-    // TODO: Navigate to registration when implemented
-    // this.router.navigate(['/auth', 'register']);
+    this.router.navigate(['/auth', 'register']);
   }
 }
