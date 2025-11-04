@@ -107,18 +107,33 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Configure kubectl with kubeconfig
-        env:
-          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Install kOps
         run: |
+          echo "Installing kOps..."
+          curl -Lo kops https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+          chmod +x kops
+          sudo mv kops /usr/local/bin/kops
+          kops version
+
+      - name: Generate kubeconfig from kOps state store
+        env:
+          KOPS_STATE_STORE: ${{ secrets.KOPS_STATE_STORE }}
+          KOPS_CLUSTER_NAME: ${{ secrets.KOPS_CLUSTER_NAME }}
+        run: |
+          echo "Exporting kubeconfig from kOps state store..."
+
           # Create .kube directory
           mkdir -p $HOME/.kube
 
-          # Decode base64 kubeconfig and save to file
-          echo "$KUBE_CONFIG_DATA" | base64 --decode > $HOME/.kube/config
-
-          # Set proper permissions
-          chmod 600 $HOME/.kube/config
+          # Export kubeconfig from kOps (reads from S3)
+          kops export kubeconfig "${KOPS_CLUSTER_NAME}" --state="${KOPS_STATE_STORE}" --admin
 
           # Verify connection to cluster
           echo "Verifying connection to Kubernetes cluster..."
