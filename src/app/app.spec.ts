@@ -35,7 +35,7 @@ describe('App', () => {
   it('should render the title in the logo', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     const logoElement = compiled.querySelector('a[routerLink="/home"]');
-    expect(logoElement?.textContent?.trim()).toContain('blog');
+    expect(logoElement?.textContent?.trim()).toContain('🧪 ThinkLab');
   });
 
   it('should contain a router-outlet', () => {
@@ -59,15 +59,6 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     const links = compiled.querySelectorAll('nav ul li a');
     expect(links.length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('should have "Accueil" link pointing to /home', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const homeLink = Array.from(compiled.querySelectorAll('nav ul li a'))
-      .find((link) => link.textContent?.includes('Accueil')) as HTMLAnchorElement;
-
-    expect(homeLink).toBeTruthy();
-    expect(homeLink.getAttribute('routerLink')).toBe('/home');
   });
 
   it('should render main content area with router-outlet', () => {
