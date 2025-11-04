@@ -73,7 +73,7 @@ echo -e "${GREEN}✅ ClusterIssuer status checked${NC}"
 
 # Step 8: Deploy or update the Ingress with TLS
 echo -e "${YELLOW}🌐 Deploying Ingress with TLS configuration...${NC}"
-kubectl apply -f ingress.yaml
+kubectl apply -f ../k8s/ingress.yaml
 echo -e "${GREEN}✅ Ingress deployed${NC}"
 
 # Step 9: Wait for certificate to be issued
