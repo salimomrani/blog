@@ -8,13 +8,14 @@ import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { unauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
+import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, unauthorizedInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, unauthorizedInterceptor, forbiddenInterceptor])),
     provideStore(),
     provideEffects(),
     provideStoreDevtools({
