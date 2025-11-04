@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ master, main ]
 
-env:
-  CERT_MANAGER_VERSION: v1.14.0
-
 jobs:
   # Job 1: Lint, Test, and Build
   build-and-test:
@@ -17,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 22.x ]
+        node-version: [22.x]
 
     steps:
       - name: Checkout code
@@ -62,23 +59,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: blog-frontend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push Docker image to Docker Hub
+      - name: Build & Push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -86,7 +73,7 @@ jobs:
           push: true
           tags: iconsultingdev/blog-frontend:latest
 
-  # Job 3: Deploy to Kubernetes (only on push to master/main after Docker image is built)
+  # Job 3: Deploy to Kubernetes
   deploy-to-kubernetes:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
@@ -101,11 +88,6 @@ jobs:
         uses: azure/setup-kubectl@v4
         with:
           version: 'v1.29.0'
-
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: 'latest'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -127,249 +109,31 @@ jobs:
           KOPS_STATE_STORE: ${{ secrets.KOPS_STATE_STORE }}
           KOPS_CLUSTER_NAME: ${{ secrets.KOPS_CLUSTER_NAME }}
         run: |
-          echo "Exporting kubeconfig from kOps state store..."
-
-          # Create .kube directory
           mkdir -p $HOME/.kube
-
-          # Export kubeconfig from kOps (reads from S3)
           kops export kubeconfig --admin
-
-          # Verify connection to cluster
-          echo "Verifying connection to Kubernetes cluster..."
           kubectl cluster-info
           kubectl get nodes
 
-      - name: Install NGINX Ingress Controller
+      - name: Install NGINX Ingress Controller (if needed)
         run: |
-          echo "==> Checking if NGINX Ingress Controller is already installed..."
-
-          # Check if the ingress-nginx namespace exists
-          if kubectl get namespace ingress-nginx &> /dev/null; then
-            echo "✓ NGINX Ingress Controller namespace already exists"
-
-            # Verify if the controller is running
-            if kubectl get deployment ingress-nginx-controller -n ingress-nginx &> /dev/null; then
-              echo "✓ NGINX Ingress Controller is already installed and running"
-
-              # Check the status
-              kubectl get pods -n ingress-nginx -l app.kubernetes.io/component=controller
-            else
-              echo "⚠ Namespace exists but controller not found. Reinstalling..."
-              kubectl delete namespace ingress-nginx --timeout=60s || true
-              sleep 5
-            fi
-          fi
-
-          # Install if not present
           if ! kubectl get namespace ingress-nginx &> /dev/null; then
-            echo "==> Installing NGINX Ingress Controller for AWS..."
-
-            # Apply the official AWS manifest for NGINX Ingress Controller
+            echo "Installing NGINX Ingress Controller..."
             kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/aws/deploy.yaml
-
-            echo "==> Waiting for NGINX Ingress Controller namespace to be created..."
-            kubectl wait --for=jsonpath='{.status.phase}'=Active namespace/ingress-nginx --timeout=60s
-
-            echo "==> Waiting for NGINX Ingress Controller pods to be ready..."
-            # Wait for the controller pod to be ready (5 minute timeout)
             kubectl wait --namespace ingress-nginx \
               --for=condition=ready pod \
               --selector=app.kubernetes.io/component=controller \
               --timeout=300s
-
-            echo "✓ NGINX Ingress Controller pods are ready"
-          fi
-
-          echo "==> Waiting for Load Balancer to be provisioned..."
-          # Wait up to 5 minutes for the LoadBalancer to get an external IP/hostname
-          SECONDS=0
-          MAX_WAIT=300
-
-          while [ $SECONDS -lt $MAX_WAIT ]; do
-            LB_HOSTNAME=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo "")
-            LB_IP=$(kubectl get service ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
-
-            if [ -n "$LB_HOSTNAME" ] || [ -n "$LB_IP" ]; then
-              echo "✓ Load Balancer is ready!"
-              if [ -n "$LB_HOSTNAME" ]; then
-                echo "  Hostname: $LB_HOSTNAME"
-              fi
-              if [ -n "$LB_IP" ]; then
-                echo "  IP: $LB_IP"
-              fi
-              break
-            fi
-
-            echo "  Waiting for Load Balancer... (${SECONDS}s elapsed)"
-            sleep 10
-          done
-
-          if [ $SECONDS -ge $MAX_WAIT ]; then
-            echo "⚠ Warning: Load Balancer took longer than expected to provision"
-            echo "  This may be normal for first-time setup. Continuing with deployment..."
-          fi
-
-          echo "==> NGINX Ingress Controller installation/verification completed"
-          echo ""
-          echo "Ingress Controller Status:"
-          kubectl get all -n ingress-nginx
-          echo ""
-          kubectl get service ingress-nginx-controller -n ingress-nginx
-
-      - name: Add cert-manager Helm repository
-        run: |
-          helm repo add jetstack https://charts.jetstack.io
-          helm repo update
-
-      - name: Install/Upgrade cert-manager
-        run: |
-          if kubectl get namespace cert-manager &> /dev/null; then
-            echo "Upgrading cert-manager..."
-            helm upgrade cert-manager jetstack/cert-manager \
-              --namespace cert-manager \
-              --version ${{ env.CERT_MANAGER_VERSION }} \
-              --set installCRDs=true \
-              --wait
           else
-            echo "Installing cert-manager..."
-            helm install cert-manager jetstack/cert-manager \
-              --namespace cert-manager \
-              --create-namespace \
-              --version ${{ env.CERT_MANAGER_VERSION }} \
-              --set installCRDs=true \
-              --wait
+            echo "Ingress Controller already installed"
           fi
 
-      - name: Wait for cert-manager to be ready
+      - name: Run SSL/TLS setup script
         run: |
-          kubectl wait --for=condition=ready pod \
-            -l app.kubernetes.io/instance=cert-manager \
-            -n cert-manager \
-            --timeout=180s
-
-      - name: Deploy ClusterIssuer
-        run: |
-          kubectl apply -f k8s/01-cluster-issuer-letsencrypt.yaml
-          sleep 5
-          kubectl get clusterissuer
-
-      - name: Apply Kubernetes manifests
-        run: |
-          echo "Applying Kubernetes manifests to kubevpro.i-consulting.shop cluster..."
-
-          # Apply manifests in order: service, deployment, ingress
-          kubectl apply -f k8s/service.yaml
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/ingress.yaml
-
-          echo "Manifests applied successfully"
+          echo "Running SSL/TLS automation with setup-ssl.sh..."
+          chmod +x ./scripts/setup-ssl.sh
+          ./scripts/setup-ssl.sh
 
       - name: Restart deployment to pull latest image
         run: |
-          echo "Restarting deployment to pull latest Docker image..."
-
-          # Restart the deployment to pull the latest image
           kubectl rollout restart deployment/blog-frontend
-
-          # Wait for rollout to complete (timeout after 5 minutes)
           kubectl rollout status deployment/blog-frontend --timeout=5m
-
-          echo "Deployment rollout completed successfully"
-
-      - name: Debug certificate issuance
-        run: |
-          echo "========================================="
-          echo "Certificate Debugging Information"
-          echo "========================================="
-
-          echo ""
-          echo "1. ClusterIssuer status:"
-          kubectl get clusterissuer letsencrypt-prod -o yaml || true
-
-          echo ""
-          echo "2. Certificate status:"
-          kubectl get certificate blog-frontend-tls-cert -o yaml || true
-
-          echo ""
-          echo "3. CertificateRequest:"
-          kubectl get certificaterequest || true
-          kubectl describe certificaterequest $(kubectl get certificaterequest -o name | head -1) || true
-
-          echo ""
-          echo "4. ACME Challenge (if exists):"
-          kubectl get challenge || true
-          kubectl describe challenge $(kubectl get challenge -o name | head -1) 2>/dev/null || echo "No challenges found"
-
-          echo ""
-          echo "5. Cert-manager logs (last 50 lines):"
-          kubectl logs -n cert-manager -l app=cert-manager --tail=50 || true
-
-          echo ""
-          echo "6. Ingress status:"
-          kubectl get ingress blog-frontend-ingress
-          kubectl describe ingress blog-frontend-ingress
-
-      - name: Wait for certificate issuance
-        continue-on-error: true
-        run: |
-          echo "Waiting for SSL certificate to be issued..."
-          echo "Note: Certificate issuance can take 5-10 minutes on first deployment"
-
-          for i in {1..24}; do
-            if kubectl get certificate blog-frontend-tls-cert &> /dev/null; then
-              CERT_READY=$(kubectl get certificate blog-frontend-tls-cert -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "False")
-
-              if [ "$CERT_READY" == "True" ]; then
-                echo "✅ Certificate is ready!"
-                kubectl get certificate blog-frontend-tls-cert
-                exit 0
-              fi
-
-              echo "Attempt $i/24: Certificate not ready yet (status: $CERT_READY)"
-            else
-              echo "Attempt $i/24: Certificate resource not found yet"
-            fi
-
-            sleep 10
-          done
-
-          echo "⚠️ Certificate not ready after 4 minutes (this is normal for first deployment)"
-          echo "The certificate will continue to be issued in the background"
-          echo "Check status with: kubectl describe certificate blog-frontend-tls-cert"
-          kubectl describe certificate blog-frontend-tls-cert || true
-          exit 0
-
-      - name: Verify deployment
-        if: always()
-        run: |
-          echo "========================================="
-          echo "Deployment Summary"
-          echo "========================================="
-          echo ""
-          echo "Cert-manager pods:"
-          kubectl get pods -n cert-manager
-          echo ""
-          echo "ClusterIssuers:"
-          kubectl get clusterissuer
-          echo ""
-          echo "Certificates:"
-          kubectl get certificate
-          echo ""
-          echo "Deployment:"
-          kubectl get deployment blog-frontend
-          echo ""
-          echo "Pods:"
-          kubectl get pods -l app=blog-frontend
-          echo ""
-          echo "Service:"
-          kubectl get service blog-frontend-service
-          echo ""
-          echo "Ingress:"
-          kubectl get ingress blog-frontend-ingress
-          echo ""
-          echo "========================================="
-          echo "Application URLs:"
-          echo "  HTTP:  http://blog.kubevpro.i-consulting.shop"
-          echo "  HTTPS: https://blog.kubevpro.i-consulting.shop"
-          echo "========================================="
