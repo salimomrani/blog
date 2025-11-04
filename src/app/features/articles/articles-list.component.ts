@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../store/articles.store';
 import { AuthStore } from '../../store/auth.store';
-import { ArticleDto } from '../../models/article.model';
+import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
 
 @Component({
   selector: 'app-articles-list',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, IsAuthorPipe],
   templateUrl: './articles-list.component.html',
   styleUrl: './articles-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -19,16 +19,5 @@ export class ArticlesListComponent implements OnInit {
 
   public ngOnInit(): void {
     this.articlesStore.loadArticles();
-  }
-
-  /**
-   * Check if the current user is the author of an article
-   */
-  protected isArticleAuthor(article: ArticleDto): boolean {
-    const user = this.authStore.user();
-    if (!user) {
-      return false;
-    }
-    return article.author.id === user.id;
   }
 }
