@@ -127,12 +127,6 @@ jobs:
             echo "Ingress Controller already installed"
           fi
 
-      - name: Authenticate GitHub CLI
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "${GITHUB_TOKEN}" | gh auth login --with-token
-
       - name: Run SSL/TLS setup script
         run: |
           echo "Running SSL/TLS automation with setup-ssl.sh..."
