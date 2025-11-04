@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ArticleDetailComponent } from './article-detail.component';
 import { ArticlesStore } from '../../store/articles.store';
 import { signal } from '@angular/core';
-import { of } from 'rxjs';
 
 describe('ArticleDetailComponent', () => {
   let component: ArticleDetailComponent;
