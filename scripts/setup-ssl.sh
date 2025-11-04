@@ -62,7 +62,7 @@ echo -e "${GREEN}✅ cert-manager CRDs verified${NC}"
 
 # Step 6: Deploy ClusterIssuer
 echo -e "${YELLOW}📜 Deploying Let's Encrypt ClusterIssuer...${NC}"
-kubectl apply -f 01-cluster-issuer-letsencrypt.yaml
+kubectl apply -f ../k8s/01-cluster-issuer-letsencrypt.yaml
 echo -e "${GREEN}✅ ClusterIssuer deployed${NC}"
 
 # Step 7: Wait for ClusterIssuer to be ready
