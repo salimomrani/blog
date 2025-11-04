@@ -9,7 +9,7 @@ import { AuthStore } from './store/auth.store';
   styleUrl: './app.css'
 })
 export class App {
-  readonly title = signal('blog');
+  readonly title = signal('ThinkLab');
   protected readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
 

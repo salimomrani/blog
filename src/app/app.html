@@ -2,20 +2,10 @@
   <div class="container-custom py-4">
     <div class="flex items-center justify-between">
       <a routerLink="/home" class="text-2xl font-bold text-primary flex items-center gap-2">
-        <span class="text-3xl">📰</span>
+        <span class="text-3xl">🧪</span>
         {{ title() }}
       </a>
       <ul class="flex gap-6 items-center">
-        <li>
-          <a
-            routerLink="/home"
-            routerLinkActive="text-primary font-semibold"
-            [routerLinkActiveOptions]="{exact: true}"
-            class="text-secondary hover:text-primary transition-colors"
-          >
-            🏠 Accueil
-          </a>
-        </li>
         @if (!authStore.isAuthenticated()) {
           <li>
             <a
