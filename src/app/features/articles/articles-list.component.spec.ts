@@ -2,12 +2,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ArticlesListComponent } from './articles-list.component';
 import { ArticlesStore } from '../../store/articles.store';
+import { AuthStore } from '../../store/auth.store';
 import { signal } from '@angular/core';
 
 describe('ArticlesListComponent', () => {
   let component: ArticlesListComponent;
   let fixture: ComponentFixture<ArticlesListComponent>;
   let mockStore: Partial<ArticlesStore>;
+  let mockAuthStore: Partial<AuthStore>;
 
   beforeEach(async () => {
     mockStore = {
@@ -19,10 +21,16 @@ describe('ArticlesListComponent', () => {
       loadArticles: jest.fn()
     };
 
+    mockAuthStore = {
+      isAuthenticated: signal(false),
+      user: signal(null)
+    };
+
     await TestBed.configureTestingModule({
       imports: [ArticlesListComponent, RouterTestingModule],
       providers: [
-        { provide: ArticlesStore, useValue: mockStore }
+        { provide: ArticlesStore, useValue: mockStore },
+        { provide: AuthStore, useValue: mockAuthStore }
       ]
     }).compileComponents();
 

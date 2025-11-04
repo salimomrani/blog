@@ -3,12 +3,14 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
 import { ArticleDetailComponent } from './article-detail.component';
 import { ArticlesStore } from '../../store/articles.store';
+import { AuthStore } from '../../store/auth.store';
 import { signal } from '@angular/core';
 
 describe('ArticleDetailComponent', () => {
   let component: ArticleDetailComponent;
   let fixture: ComponentFixture<ArticleDetailComponent>;
   let mockStore: Partial<ArticlesStore>;
+  let mockAuthStore: Partial<AuthStore>;
 
   beforeEach(async () => {
     mockStore = {
@@ -19,10 +21,16 @@ describe('ArticleDetailComponent', () => {
       deleteArticle: jest.fn()
     };
 
+    mockAuthStore = {
+      isAuthenticated: signal(false),
+      user: signal(null)
+    };
+
     await TestBed.configureTestingModule({
       imports: [ArticleDetailComponent, RouterTestingModule],
       providers: [
         { provide: ArticlesStore, useValue: mockStore },
+        { provide: AuthStore, useValue: mockAuthStore },
         {
           provide: ActivatedRoute,
           useValue: {
