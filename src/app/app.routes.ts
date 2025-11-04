@@ -31,6 +31,29 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
   },
+  {
+    path: 'articles',
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/articles/articles-list.component').then(m => m.ArticlesListComponent)
+      },
+      {
+        path: 'new',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/articles/article-form.component').then(m => m.ArticleFormComponent)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/articles/article-detail.component').then(m => m.ArticleDetailComponent)
+      },
+      {
+        path: ':id/edit',
+        canActivate: [authGuard],
+        loadComponent: () => import('./features/articles/article-form.component').then(m => m.ArticleFormComponent)
+      }
+    ]
+  },
   // TODO: Add users routes when implemented
   // {
   //   path: 'users',

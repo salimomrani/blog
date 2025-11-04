@@ -1,11 +1,20 @@
 <nav class="bg-white shadow-md sticky top-0 z-50">
   <div class="container-custom py-4">
     <div class="flex items-center justify-between">
-      <a routerLink="/home" class="text-2xl font-bold text-primary flex items-center gap-2">
+      <a routerLink="/home" class="no-underline text-2xl font-bold text-primary flex items-center gap-2">
         <span class="text-3xl">🧪</span>
         {{ title() }}
       </a>
       <ul class="flex gap-6 items-center">
+        <li>
+          <a
+            routerLink="/articles"
+            routerLinkActive="text-primary font-semibold"
+            class="text-secondary hover:text-primary transition-colors"
+          >
+            📚 Articles
+          </a>
+        </li>
         @if (!authStore.isAuthenticated()) {
           <li>
             <a
