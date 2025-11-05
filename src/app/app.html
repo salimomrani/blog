@@ -15,7 +15,7 @@
             📚 Articles
           </a>
         </li>
-        @if (authStore.isAuthenticated()) {
+        @if (authStore.isAdmin()) {
           <li>
             <a
               routerLink="/users"
