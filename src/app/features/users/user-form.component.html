@@ -114,26 +114,38 @@
           <select
             id="role"
             formControlName="role"
-            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
           >
             <option value="USER">Utilisateur</option>
             <option value="MODERATOR">Modérateur</option>
             <option value="ADMIN">Administrateur</option>
           </select>
+          @if (isEditingSelf()) {
+            <p class="mt-2 text-sm text-blue-600">
+              ℹ️ Vous ne pouvez pas modifier votre propre rôle pour des raisons de sécurité
+            </p>
+          }
         </div>
 
         <!-- Active (only for edit) -->
         @if (isEditMode) {
-          <div class="flex items-center">
-            <input
-              type="checkbox"
-              id="active"
-              formControlName="active"
-              class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-            />
-            <label for="active" class="ml-2 block text-sm text-gray-900">
-              Compte actif
-            </label>
+          <div>
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                id="active"
+                formControlName="active"
+                class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded disabled:cursor-not-allowed"
+              />
+              <label for="active" class="ml-2 block text-sm text-gray-900">
+                Compte actif
+              </label>
+            </div>
+            @if (isEditingSelf()) {
+              <p class="mt-2 text-sm text-blue-600">
+                ℹ️ Vous ne pouvez pas désactiver votre propre compte
+              </p>
+            }
           </div>
         }
 

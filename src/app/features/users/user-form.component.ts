@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersStore } from '../../store/users.store';
+import { AuthStore } from '../../store/auth.store';
 
 @Component({
   selector: 'app-user-form',
@@ -17,6 +18,7 @@ export class UserFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly usersStore = inject(UsersStore);
+  readonly authStore = inject(AuthStore);
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -30,6 +32,15 @@ export class UserFormComponent implements OnInit {
 
   protected isEditMode = false;
   protected userId: number | null = null;
+
+  /**
+   * Check if admin is editing their own profile
+   */
+  protected readonly isEditingSelf = computed(() => {
+    const currentUser = this.authStore.user();
+    const selectedUser = this.usersStore.selectedUser();
+    return currentUser && selectedUser && currentUser.id === selectedUser.id;
+  });
 
   constructor() {
     // Effect to populate form when selectedUser changes
@@ -47,6 +58,15 @@ export class UserFormComponent implements OnInit {
         // Password not required for edit
         this.form.get('password')?.clearValidators();
         this.form.get('password')?.updateValueAndValidity();
+
+        // Disable role and active fields if admin is editing themselves
+        if (this.isEditingSelf()) {
+          this.form.get('role')?.disable();
+          this.form.get('active')?.disable();
+        } else {
+          this.form.get('role')?.enable();
+          this.form.get('active')?.enable();
+        }
       }
     });
   }
