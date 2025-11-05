@@ -15,6 +15,17 @@
             📚 Articles
           </a>
         </li>
+        @if (authStore.isAuthenticated()) {
+          <li>
+            <a
+              routerLink="/users"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors"
+            >
+              👥 Utilisateurs
+            </a>
+          </li>
+        }
         @if (!authStore.isAuthenticated()) {
           <li>
             <a
