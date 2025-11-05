@@ -44,7 +44,7 @@ jobs:
         run: npm test
 
       - name: Build application
-        run: npm run build
+        run: ng build blog --configuration production
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
