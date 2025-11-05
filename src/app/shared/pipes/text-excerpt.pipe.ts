@@ -16,7 +16,7 @@ export class TextExcerptPipe implements PipeTransform {
    * @param maxLength Maximum length of excerpt (default: 150)
    * @returns Plain text excerpt with ellipsis if truncated
    */
-  public transform(value: string, maxLength: number = 150): string {
+  public transform(value: string, maxLength = 150): string {
     if (!value) {
       return '';
     }
