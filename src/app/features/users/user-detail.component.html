@@ -86,13 +86,20 @@
               </svg>
               Modifier
             </a>
-            <button
-              (click)="onDelete()"
-              class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-150"
-            >
-              Supprimer
-            </button>
+            @if (!isViewingSelf()) {
+              <button
+                (click)="onDelete()"
+                class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-150"
+              >
+                Supprimer
+              </button>
+            }
           </div>
+          @if (isViewingSelf()) {
+            <p class="mt-4 text-sm text-blue-600 text-center">
+              ℹ️ Vous ne pouvez pas supprimer votre propre compte pour des raisons de sécurité
+            </p>
+          }
         }
       </div>
     </div>
