@@ -43,6 +43,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Install Angular CLI
+        run: npm install -g @angular/cli
+
       - name: Build application
         run: ng build blog --configuration production
 
