@@ -36,6 +36,7 @@ export const AuthStore = signalStore(
     })),
   withComputed((state) => ({
     isAuthenticated: computed(() => !!state.accessToken()),
+    isAdmin: computed(() => state.user()?.role === 'ADMIN'),
     fullName: computed(() => state.user()?.fullName ?? null),
     firstName: computed(() => state.user()?.firstName ?? null)
   })),
