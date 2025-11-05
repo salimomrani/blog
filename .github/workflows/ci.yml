@@ -167,8 +167,10 @@ jobs:
 
       - name: Deploy application
         run: |
-          echo "::group::Restart deployment"
-          kubectl rollout restart deployment/blog-frontend
+          echo "::group::Apply Kubernetes manifests"
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
 
           echo "Waiting for rollout to complete..."
           kubectl rollout status deployment/blog-frontend --timeout=5m
