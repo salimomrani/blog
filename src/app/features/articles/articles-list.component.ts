@@ -4,11 +4,12 @@ import { RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../store/articles.store';
 import { AuthStore } from '../../store/auth.store';
 import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
+import { TextExcerptPipe } from '../../shared/pipes/text-excerpt.pipe';
 
 @Component({
   selector: 'app-articles-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, IsAuthorPipe],
+  imports: [CommonModule, RouterLink, IsAuthorPipe, TextExcerptPipe],
   templateUrl: './articles-list.component.html',
   styleUrl: './articles-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

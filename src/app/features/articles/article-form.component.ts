@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../store/articles.store';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-article-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, QuillModule],
   templateUrl: './article-form.component.html',
   styleUrl: './article-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,6 +26,28 @@ export class ArticleFormComponent implements OnInit {
 
   protected isEditMode = false;
   protected articleId: number | null = null;
+
+  /**
+   * Quill editor configuration with rich formatting options
+   */
+  protected readonly quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+      [{ 'direction': 'rtl' }],                         // text direction
+      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['clean'],                                         // remove formatting button
+      ['link', 'image', 'video']                        // link, image, and video
+    ]
+  };
 
   constructor() {
     // Effect to populate form when selectedArticle changes

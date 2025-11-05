@@ -90,7 +90,7 @@
               {{ article.title }}
             </h2>
             <p class="text-gray-600 mb-4 line-clamp-3">
-              {{ article.content }}
+              {{ article.content | textExcerpt:200 }}
             </p>
 
             <!-- Author & Date -->
