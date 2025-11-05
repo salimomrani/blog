@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UserDto } from './auth.service';
 
 export interface CreateUserRequest {
@@ -27,6 +28,25 @@ export interface ApiResponseUserDto {
   data: UserDto;
 }
 
+export interface PageableResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+  first: boolean;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  empty: boolean;
+}
+
 export interface ApiResponseListUserDto {
   success: boolean;
   message: string;
@@ -42,10 +62,18 @@ export class UsersService {
   private readonly baseUrl = 'http://localhost:8080/api/v1/users';
 
   /**
-   * Get all users
+   * Get all users (with pagination support)
    */
-  public getAll(): Observable<ApiResponseListUserDto> {
-    return this.http.get<ApiResponseListUserDto>(this.baseUrl);
+  public getAll(page = 0, size = 100): Observable<ApiResponseListUserDto> {
+    return this.http.get<PageableResponse<UserDto>>(this.baseUrl, {
+      params: { page: page.toString(), size: size.toString() }
+    }).pipe(
+      map(response => ({
+        success: true,
+        message: `${response.totalElements} utilisateur(s) trouvé(s)`,
+        data: response.content
+      }))
+    );
   }
 
   /**
