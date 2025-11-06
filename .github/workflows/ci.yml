@@ -183,6 +183,33 @@ jobs:
           kubectl rollout status deployment/blog-frontend -n blog-frontend --timeout=5m
           echo "::endgroup::"
 
+      - name: Wait for SSL certificate
+        run: |
+          echo "::group::SSL Certificate Status"
+          echo "Waiting for certificate to be issued (may take 1-3 minutes)..."
+
+          for i in {1..12}; do
+            echo "Attempt $i/12 - Checking certificate..."
+
+            if kubectl get certificate blog-frontend-tls-cert -n blog-frontend &> /dev/null; then
+              CERT_READY=$(kubectl get certificate blog-frontend-tls-cert -n blog-frontend -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' || echo "False")
+
+              if [ "$CERT_READY" == "True" ]; then
+                echo "✅ Certificate is ready!"
+                kubectl get certificate blog-frontend-tls-cert -n blog-frontend
+                echo "::endgroup::"
+                exit 0
+              fi
+            fi
+
+            echo "Certificate not ready yet, waiting..."
+            sleep 10
+          done
+
+          echo "⚠️ Certificate not ready after 2 minutes"
+          kubectl describe certificate blog-frontend-tls-cert -n blog-frontend || true
+          echo "::endgroup::"
+
       - name: Health check
         run: |
           echo "::group::Application health check"

@@ -71,44 +71,10 @@ sleep 5
 kubectl get clusterissuer
 echo -e "${GREEN}✅ ClusterIssuer status checked${NC}"
 
-# Step 8: Deploy or update the Ingress with TLS
-echo -e "${YELLOW}🌐 Deploying Ingress with TLS configuration...${NC}"
-kubectl apply -f ../k8s/ingress.yaml
-echo -e "${GREEN}✅ Ingress deployed${NC}"
-
-# Step 9: Wait for certificate to be issued
-echo -e "${YELLOW}⏳ Waiting for SSL certificate to be issued (this may take 1-3 minutes)...${NC}"
-echo "Certificate status:"
-sleep 10
-
-# Check certificate status multiple times
-for i in {1..12}; do
-    echo -e "\n${YELLOW}Attempt $i/12 - Checking certificate status...${NC}"
-
-    if kubectl get certificate blog-frontend-tls-cert &> /dev/null; then
-        kubectl get certificate blog-frontend-tls-cert
-
-        # Check if certificate is ready
-        CERT_READY=$(kubectl get certificate blog-frontend-tls-cert -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
-
-        if [ "$CERT_READY" == "True" ]; then
-            echo -e "${GREEN}✅ Certificate is ready!${NC}"
-            break
-        fi
-    else
-        echo -e "${YELLOW}Certificate not found yet, waiting...${NC}"
-    fi
-
-    if [ $i -eq 12 ]; then
-        echo -e "${RED}⚠️  Certificate not ready after 2 minutes. Check logs below:${NC}"
-        kubectl describe certificate blog-frontend-tls-cert
-    fi
-
-    sleep 10
-done
+# Note: Ingress and certificate deployment is handled by the CI/CD pipeline after namespace creation
 
 echo -e "\n${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${GREEN}🎉 SSL/TLS setup completed!${NC}"
+echo -e "${GREEN}🎉 SSL/TLS infrastructure setup completed!${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 echo -e "\n${YELLOW}📋 Resource Summary:${NC}"
@@ -118,20 +84,12 @@ kubectl get pods -n cert-manager
 echo -e "\n${YELLOW}ClusterIssuers:${NC}"
 kubectl get clusterissuer
 
-echo -e "\n${YELLOW}Certificates:${NC}"
-kubectl get certificate
-
-echo -e "\n${YELLOW}Ingress:${NC}"
-kubectl get ingress blog-frontend-ingress
-
-echo -e "\n${YELLOW}🔗 Access your application:${NC}"
-echo "  HTTP:  http://blog.kubevpro.i-consulting.shop"
-echo "  HTTPS: https://blog.kubevpro.i-consulting.shop"
-
-echo -e "\n${YELLOW}💡 Useful commands:${NC}"
-echo "  Check certificate:        kubectl describe certificate blog-frontend-tls-cert"
-echo "  Check cert-manager logs:  kubectl logs -n cert-manager -l app=cert-manager"
-echo "  Check certificate secret: kubectl get secret blog-frontend-tls-cert"
-echo "  Test HTTPS:               curl -I https://blog.kubevpro.i-consulting.shop"
+echo -e "\n${YELLOW}💡 Next steps:${NC}"
+echo "  1. Namespace and ingress will be deployed by the CI/CD pipeline"
+echo "  2. Certificate will be automatically issued by cert-manager"
+echo "  3. Use these commands after deployment:"
+echo "     kubectl describe certificate blog-frontend-tls-cert -n blog-frontend"
+echo "     kubectl logs -n cert-manager -l app=cert-manager"
+echo "     kubectl get secret blog-frontend-tls-cert -n blog-frontend"
 
 echo -e "\n${GREEN}✨ Done!${NC}"
