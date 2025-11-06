@@ -178,7 +178,16 @@ jobs:
           kubectl apply -f k8s/namespace.yaml
           kubectl get namespace blog-frontend
 
+          # Clean up old resources from default namespace (if they exist)
+          echo ""
+          echo "Cleaning up old resources from default namespace..."
+          kubectl delete ingress blog-frontend-ingress -n default --ignore-not-found=true
+          kubectl delete service blog-frontend-service -n default --ignore-not-found=true
+          kubectl delete deployment blog-frontend -n default --ignore-not-found=true
+          echo "✅ Old resources cleaned up"
+
           # Apply deployment
+          echo ""
           echo "Deploying application..."
           kubectl apply -f k8s/deployment.yaml
           echo "✅ Deployment applied"
