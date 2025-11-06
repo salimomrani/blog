@@ -171,12 +171,16 @@ jobs:
       - name: Deploy application
         run: |
           echo "::group::Apply Kubernetes manifests"
+          # Create namespace first
+          kubectl apply -f k8s/namespace.yaml
+
+          # Apply other resources
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
           kubectl apply -f k8s/ingress.yaml
 
           echo "Waiting for rollout to complete..."
-          kubectl rollout status deployment/blog-frontend --timeout=5m
+          kubectl rollout status deployment/blog-frontend -n blog-frontend --timeout=5m
           echo "::endgroup::"
 
       - name: Health check
@@ -211,19 +215,19 @@ jobs:
           echo ""
 
           echo "Pods:"
-          kubectl get pods -l app=blog-frontend
+          kubectl get pods -l app=blog-frontend -n blog-frontend
           echo ""
 
           echo "Service:"
-          kubectl get service blog-frontend-service
+          kubectl get service blog-frontend-service -n blog-frontend
           echo ""
 
           echo "Ingress:"
-          kubectl get ingress blog-frontend-ingress
+          kubectl get ingress blog-frontend-ingress -n blog-frontend
           echo ""
 
           echo "Certificates:"
-          kubectl get certificate
+          kubectl get certificate -n blog-frontend
           echo ""
 
           echo "========================================="
