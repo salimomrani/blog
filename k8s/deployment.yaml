@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: blog-frontend
+  namespace: blog-frontend
   labels:
     app: blog-frontend
 spec:

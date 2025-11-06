@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: blog-frontend-service
+  namespace: blog-frontend
   labels:
     app: blog-frontend
 spec:
