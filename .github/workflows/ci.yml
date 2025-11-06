@@ -170,15 +170,40 @@ jobs:
 
       - name: Deploy application
         run: |
+          set -e  # Exit on error
           echo "::group::Apply Kubernetes manifests"
+
           # Create namespace first
+          echo "Creating namespace..."
           kubectl apply -f k8s/namespace.yaml
+          kubectl get namespace blog-frontend
 
-          # Apply other resources
+          # Apply deployment
+          echo "Deploying application..."
           kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
-          kubectl apply -f k8s/ingress.yaml
+          echo "✅ Deployment applied"
 
+          # Apply service
+          echo "Creating service..."
+          kubectl apply -f k8s/service.yaml
+          echo "✅ Service applied"
+
+          # Apply ingress
+          echo "Creating ingress..."
+          kubectl apply -f k8s/ingress.yaml
+          echo "✅ Ingress applied"
+
+          # Verify resources were created
+          echo ""
+          echo "Verifying resources..."
+          echo "Deployment:"
+          kubectl get deployment blog-frontend -n blog-frontend
+          echo "Service:"
+          kubectl get service blog-frontend-service -n blog-frontend
+          echo "Ingress:"
+          kubectl get ingress blog-frontend-ingress -n blog-frontend
+
+          echo ""
           echo "Waiting for rollout to complete..."
           kubectl rollout status deployment/blog-frontend -n blog-frontend --timeout=5m
           echo "::endgroup::"
@@ -241,6 +266,14 @@ jobs:
           echo "========================================="
           echo ""
 
+          echo "Namespace status:"
+          kubectl get namespace blog-frontend
+          echo ""
+
+          echo "All resources in blog-frontend namespace:"
+          kubectl get all -n blog-frontend
+          echo ""
+
           echo "Pods:"
           kubectl get pods -l app=blog-frontend -n blog-frontend
           echo ""
@@ -249,12 +282,16 @@ jobs:
           kubectl get service blog-frontend-service -n blog-frontend
           echo ""
 
-          echo "Ingress:"
-          kubectl get ingress blog-frontend-ingress -n blog-frontend
+          echo "Ingress (in blog-frontend namespace):"
+          kubectl get ingress -n blog-frontend
+          echo ""
+
+          echo "All Ingresses (all namespaces - for debugging):"
+          kubectl get ingress --all-namespaces | grep blog-frontend || echo "No blog-frontend ingress found in any namespace"
           echo ""
 
           echo "Certificates:"
-          kubectl get certificate -n blog-frontend
+          kubectl get certificate -n blog-frontend || echo "No certificates found"
           echo ""
 
           echo "========================================="
