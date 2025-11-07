@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../store/articles.store';
+import { CategoriesStore } from '../../store/categories.store';
+import { TagsStore } from '../../store/tags.store';
 import { QuillModule } from 'ngx-quill';
 
 @Component({
@@ -18,10 +20,14 @@ export class ArticleFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly articlesStore = inject(ArticlesStore);
+  readonly categoriesStore = inject(CategoriesStore);
+  readonly tagsStore = inject(TagsStore);
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
-    content: ['', [Validators.required, Validators.minLength(10)]]
+    content: ['', [Validators.required, Validators.minLength(10)]],
+    categoryIds: [[] as number[]],
+    tagIds: [[] as number[]]
   });
 
   protected isEditMode = false;
@@ -56,19 +62,55 @@ export class ArticleFormComponent implements OnInit {
       if (article && this.isEditMode) {
         this.form.patchValue({
           title: article.title,
-          content: article.content
+          content: article.content,
+          categoryIds: article.categories?.map(c => c.id) ?? [],
+          tagIds: article.tags?.map(t => t.id) ?? []
         });
       }
     });
   }
 
   public ngOnInit(): void {
+    // Load categories and tags
+    this.categoriesStore.loadCategories();
+    this.tagsStore.loadTags();
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
       this.articleId = Number(id);
       this.articlesStore.loadArticleById(this.articleId);
     }
+  }
+
+  protected toggleCategory(categoryId: number): void {
+    const currentIds = this.form.controls.categoryIds.value;
+    const index = currentIds.indexOf(categoryId);
+
+    if (index === -1) {
+      this.form.controls.categoryIds.setValue([...currentIds, categoryId]);
+    } else {
+      this.form.controls.categoryIds.setValue(currentIds.filter(id => id !== categoryId));
+    }
+  }
+
+  protected toggleTag(tagId: number): void {
+    const currentIds = this.form.controls.tagIds.value;
+    const index = currentIds.indexOf(tagId);
+
+    if (index === -1) {
+      this.form.controls.tagIds.setValue([...currentIds, tagId]);
+    } else {
+      this.form.controls.tagIds.setValue(currentIds.filter(id => id !== tagId));
+    }
+  }
+
+  protected isCategorySelected(categoryId: number): boolean {
+    return this.form.controls.categoryIds.value.includes(categoryId);
+  }
+
+  protected isTagSelected(tagId: number): boolean {
+    return this.form.controls.tagIds.value.includes(tagId);
   }
 
   protected onSubmit(): void {

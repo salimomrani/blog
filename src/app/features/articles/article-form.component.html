@@ -74,6 +74,80 @@
           }
         </div>
 
+        <!-- Categories -->
+        <div>
+          <div class="block text-sm font-semibold text-gray-700 mb-3">
+            Catégories
+          </div>
+          @if (categoriesStore.isLoading()) {
+            <div class="flex items-center text-gray-500">
+              <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Chargement des catégories...
+            </div>
+          } @else if (categoriesStore.hasCategories()) {
+            <div class="flex flex-wrap gap-2">
+              @for (category of categoriesStore.categories(); track category.id) {
+                <button
+                  type="button"
+                  (click)="toggleCategory(category.id)"
+                  class="px-4 py-2 rounded-lg border-2 transition duration-150"
+                  [class.bg-purple-100]="isCategorySelected(category.id)"
+                  [class.border-purple-600]="isCategorySelected(category.id)"
+                  [class.text-purple-700]="isCategorySelected(category.id)"
+                  [class.bg-white]="!isCategorySelected(category.id)"
+                  [class.border-gray-300]="!isCategorySelected(category.id)"
+                  [class.text-gray-700]="!isCategorySelected(category.id)"
+                  [class.hover:border-purple-400]="!isCategorySelected(category.id)"
+                >
+                  {{ category.name }}
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="text-sm text-gray-500">Aucune catégorie disponible</p>
+          }
+        </div>
+
+        <!-- Tags -->
+        <div>
+          <div class="block text-sm font-semibold text-gray-700 mb-3">
+            Tags
+          </div>
+          @if (tagsStore.isLoading()) {
+            <div class="flex items-center text-gray-500">
+              <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Chargement des tags...
+            </div>
+          } @else if (tagsStore.hasTags()) {
+            <div class="flex flex-wrap gap-2">
+              @for (tag of tagsStore.tags(); track tag.id) {
+                <button
+                  type="button"
+                  (click)="toggleTag(tag.id)"
+                  class="px-3 py-1 rounded-full border-2 text-sm transition duration-150"
+                  [class.bg-blue-100]="isTagSelected(tag.id)"
+                  [class.border-blue-600]="isTagSelected(tag.id)"
+                  [class.text-blue-700]="isTagSelected(tag.id)"
+                  [class.bg-white]="!isTagSelected(tag.id)"
+                  [class.border-gray-300]="!isTagSelected(tag.id)"
+                  [class.text-gray-700]="!isTagSelected(tag.id)"
+                  [class.hover:border-blue-400]="!isTagSelected(tag.id)"
+                >
+                  #{{ tag.name }}
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="text-sm text-gray-500">Aucun tag disponible</p>
+          }
+        </div>
+
         <!-- Actions -->
         <div class="flex gap-3 pt-4">
           <button
