@@ -78,6 +78,16 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'admin',
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: 'categories-tags',
+        loadComponent: () => import('./features/admin/categories-tags-management.component').then(m => m.CategoriesTagsManagementComponent)
+      }
+    ]
+  },
+  {
     path: '**',
     redirectTo: 'home'
   }
