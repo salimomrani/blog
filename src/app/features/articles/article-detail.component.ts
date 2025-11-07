@@ -4,11 +4,13 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../store/articles.store';
 import { AuthStore } from '../../store/auth.store';
 import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
+import { CommentListComponent } from '../comments/comment-list.component';
+import { CommentFormComponent } from '../comments/comment-form.component';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, IsAuthorPipe],
+  imports: [CommonModule, RouterLink, IsAuthorPipe, CommentListComponent, CommentFormComponent],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

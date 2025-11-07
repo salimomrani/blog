@@ -59,6 +59,12 @@
           </div>
         }
       </article>
+
+      <!-- Comments Section -->
+      <div class="mt-8">
+        <app-comment-form [articleId]="article.id" />
+        <app-comment-list [articleId]="article.id" />
+      </div>
     </div>
   }
 </div>

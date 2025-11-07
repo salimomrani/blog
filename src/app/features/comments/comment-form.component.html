@@ -1,0 +1,74 @@
+<!-- Comment Form (only for authenticated users) -->
+@if (authStore.isAuthenticated()) {
+  <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <h4 class="text-lg font-semibold text-gray-900 mb-4">Ajouter un commentaire</h4>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <!-- Content Textarea -->
+      <div class="mb-4">
+        <textarea
+          formControlName="content"
+          rows="4"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent resize-none"
+          [class.border-red-500]="form.get('content')?.invalid && form.get('content')?.touched"
+          placeholder="Partagez votre opinion..."
+        ></textarea>
+
+        <!-- Validation Error -->
+        @if (form.get('content')?.invalid && form.get('content')?.touched) {
+          <p class="mt-1 text-sm text-red-600">
+            @if (form.get('content')?.hasError('required')) {
+              Le commentaire ne peut pas être vide
+            }
+            @if (form.get('content')?.hasError('minlength')) {
+              Le commentaire doit contenir au moins 1 caractère
+            }
+            @if (form.get('content')?.hasError('maxlength')) {
+              Le commentaire ne peut pas dépasser 500 caractères
+            }
+          </p>
+        }
+
+        <!-- Character Count -->
+        <div class="mt-1 text-right">
+          <span class="text-xs text-gray-500">
+            {{ form.get('content')?.value?.length || 0 }} / 500
+          </span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="flex justify-end">
+        <button
+          type="submit"
+          [disabled]="form.invalid || commentsStore.isLoading()"
+          class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          @if (commentsStore.isLoading()) {
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Publication...
+          } @else {
+            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Publier le commentaire
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+} @else {
+  <!-- Login prompt for non-authenticated users -->
+  <div class="bg-gray-50 rounded-lg p-6 mb-6 text-center">
+    <p class="text-gray-600 mb-4">Vous devez être connecté pour commenter</p>
+    <a
+      routerLink="/auth/login"
+      class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition duration-150"
+    >
+      Se connecter
+    </a>
+  </div>
+}
