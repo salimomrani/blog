@@ -1,17 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ArticleFormComponent } from './article-form.component';
 import { ArticlesStore } from '../../store/articles.store';
+import { CategoriesStore } from '../../store/categories.store';
+import { TagsStore } from '../../store/tags.store';
 import { signal } from '@angular/core';
 
 describe('ArticleFormComponent', () => {
   let component: ArticleFormComponent;
   let fixture: ComponentFixture<ArticleFormComponent>;
-  let mockStore: Partial<ArticlesStore>;
+  let mockArticlesStore: Partial<ArticlesStore>;
+  let mockCategoriesStore: Partial<CategoriesStore>;
+  let mockTagsStore: Partial<TagsStore>;
 
   beforeEach(async () => {
-    mockStore = {
+    mockArticlesStore = {
       selectedArticle: signal(null),
       isLoading: signal(false),
       error: signal(null),
@@ -20,10 +26,30 @@ describe('ArticleFormComponent', () => {
       updateArticle: jest.fn()
     };
 
+    mockCategoriesStore = {
+      categories: signal([]),
+      isLoading: signal(false),
+      error: signal(null),
+      hasCategories: signal(false),
+      loadCategories: jest.fn()
+    };
+
+    mockTagsStore = {
+      tags: signal([]),
+      isLoading: signal(false),
+      error: signal(null),
+      hasTags: signal(false),
+      loadTags: jest.fn()
+    };
+
     await TestBed.configureTestingModule({
       imports: [ArticleFormComponent, RouterTestingModule],
       providers: [
-        { provide: ArticlesStore, useValue: mockStore },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: ArticlesStore, useValue: mockArticlesStore },
+        { provide: CategoriesStore, useValue: mockCategoriesStore },
+        { provide: TagsStore, useValue: mockTagsStore },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -49,7 +75,9 @@ describe('ArticleFormComponent', () => {
     fixture.detectChanges();
     expect(component.form.value).toEqual({
       title: '',
-      content: ''
+      content: '',
+      categoryIds: [],
+      tagIds: []
     });
   });
 
@@ -79,8 +107,19 @@ describe('ArticleFormComponent', () => {
   });
 
   it('should not submit invalid form', () => {
-    component.form.setValue({ title: '', content: '' });
+    component.form.setValue({
+      title: '',
+      content: '',
+      categoryIds: [],
+      tagIds: []
+    });
     component['onSubmit']();
-    expect(mockStore.createArticle).not.toHaveBeenCalled();
+    expect(mockArticlesStore.createArticle).not.toHaveBeenCalled();
+  });
+
+  it('should load categories and tags on init', () => {
+    fixture.detectChanges();
+    expect(mockCategoriesStore.loadCategories).toHaveBeenCalled();
+    expect(mockTagsStore.loadTags).toHaveBeenCalled();
   });
 });
