@@ -86,9 +86,28 @@
         <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden">
           <!-- Article Content -->
           <div class="p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+            <h2 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
               {{ article.title }}
             </h2>
+
+            <!-- Categories and Tags -->
+            <div class="flex flex-wrap gap-1 mb-3">
+              @if (article.categories && article.categories.length > 0) {
+                @for (category of article.categories; track category.id) {
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700 font-medium">
+                    {{ category.name }}
+                  </span>
+                }
+              }
+              @if (article.tags && article.tags.length > 0) {
+                @for (tag of article.tags; track tag.id) {
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700">
+                    #{{ tag.name }}
+                  </span>
+                }
+              }
+            </div>
+
             <p class="text-gray-600 mb-4 line-clamp-3">
               {{ article.content | textExcerpt:200 }}
             </p>
