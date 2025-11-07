@@ -1,6 +1,18 @@
 // Article detail styles
 
 .article-content {
+  // Prevent content overflow
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+  overflow-x: hidden;
+
+  // Ensure all child elements respect container width
+  ::ng-deep * {
+    max-width: 100%;
+  }
+
   // Image styling
   ::ng-deep img {
     max-width: 100%;
@@ -68,6 +80,9 @@
     padding: 1rem;
     overflow-x: auto;
     margin: 1.5rem 0;
+    max-width: 100%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 
   ::ng-deep code {
@@ -76,6 +91,28 @@
     border-radius: 4px;
     font-size: 0.875rem;
     font-family: 'Courier New', monospace;
+    word-wrap: break-word;
+  }
+
+  // Tables
+  ::ng-deep table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    display: block;
+  }
+
+  ::ng-deep th,
+  ::ng-deep td {
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem;
+    text-align: left;
+  }
+
+  ::ng-deep th {
+    background-color: #f3f4f6;
+    font-weight: 600;
   }
 
   // Links
