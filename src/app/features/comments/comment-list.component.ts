@@ -28,7 +28,7 @@ export class CommentListComponent implements OnInit {
   }
 
   public isCommentAuthor(authorId: number): boolean {
-    const currentUser = this.authStore.currentUser();
+    const currentUser = this.authStore.user();
     return currentUser?.id === authorId;
   }
 }
