@@ -25,6 +25,15 @@
               👥 Utilisateurs
             </a>
           </li>
+          <li>
+            <a
+              routerLink="/admin/categories-tags"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors"
+            >
+              ⚙️ Catégories & Tags
+            </a>
+          </li>
         }
         @if (!authStore.isAuthenticated()) {
           <li>
