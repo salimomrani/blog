@@ -4,7 +4,7 @@ import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { pipe, tap, switchMap, catchError, EMPTY } from 'rxjs';
 import { computed } from '@angular/core';
 import { ArticleDto, CreateArticleRequest, UpdateArticleRequest } from '../models/article.model';
-import { ArticlesService } from '../services/articles.service';
+import { ArticlesService, ArticleSearchParams } from '../services/articles.service';
 
 export interface ArticlesState {
   articles: ArticleDto[];
@@ -53,6 +53,32 @@ export const ArticlesStore = signalStore(
           }),
           catchError((error) => {
             const errorMessage = error?.error?.message ?? error?.message ?? 'Erreur lors du chargement des articles';
+            patchState(store, { error: errorMessage, isLoading: false });
+            return EMPTY;
+          })
+        ))
+      )
+    ),
+
+    /**
+     * Search articles with filters
+     */
+    searchArticles: rxMethod<ArticleSearchParams>(
+      pipe(
+        tap(() => patchState(store, { isLoading: true, error: null })),
+        switchMap((params) => articlesService.search(params).pipe(
+          tap((response) => {
+            if (response.success) {
+              patchState(store, {
+                articles: response.data,
+                isLoading: false
+              });
+            } else {
+              throw new Error(response.message);
+            }
+          }),
+          catchError((error) => {
+            const errorMessage = error?.error?.message ?? error?.message ?? 'Erreur lors de la recherche';
             patchState(store, { error: errorMessage, isLoading: false });
             return EMPTY;
           })
