@@ -1,4 +1,7 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode, APP_INITIALIZER, inject } from '@angular/core';
+import {
+  ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode, inject,
+  provideAppInitializer
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
@@ -16,17 +19,10 @@ import { AuthStore } from './store/auth.store';
  * Actively calls /me API to load user profile on page refresh
  * This ensures all guards and services have correct auth state before navigation
  */
-function initializeAuth(): () => Promise<void> {
+export function initializeAuth() {
   return () => {
     const authStore = inject(AuthStore);
-
-    // Call /me API to load authenticated user profile
-    return new Promise<void>((resolve) => {
-      authStore.loadUserProfile().subscribe({
-        complete: () => resolve(),
-        error: () => resolve() // Resolve even on error to let app continue
-      });
-    });
+    return authStore.loadUserProfile().toPromise().catch(() => {});
   };
 }
 
@@ -45,10 +41,7 @@ export const appConfig: ApplicationConfig = {
       trace: false,
       traceLimit: 75,
     }),
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeAuth,
-      multi: true
-    }
+    provideAppInitializer(initializeAuth()),
+
   ]
 };
