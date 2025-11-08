@@ -17,11 +17,14 @@ export interface CommentDto {
   author: AuthorDto;
   createdAt: string;
   updatedAt: string;
+  parentId?: number;
+  replies?: CommentDto[];
 }
 
 export interface CreateCommentRequest {
   content: string; // minimum 1 character
   articleId: number;
+  parentId?: number;
 }
 
 export interface UpdateCommentRequest {

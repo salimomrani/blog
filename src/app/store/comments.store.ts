@@ -29,7 +29,25 @@ export const CommentsStore = signalStore(
   })),
   withComputed((state) => ({
     commentsCount: computed(() => state.comments().length),
-    hasComments: computed(() => state.comments().length > 0)
+    hasComments: computed(() => state.comments().length > 0),
+    nestedComments: computed(() => {
+      const comments = state.comments();
+      const commentMap = new Map<number, CommentDto>(comments.map(comment => [comment.id, { ...comment, replies: [] }]));
+      const rootComments: CommentDto[] = [];
+
+      for (const comment of comments) {
+        if (comment.parentId) {
+          const parent = commentMap.get(comment.parentId);
+          if (parent) {
+            parent.replies?.push(commentMap.get(comment.id)!);
+          }
+        } else {
+          rootComments.push(commentMap.get(comment.id)!);
+        }
+      }
+
+      return rootComments;
+    })
   })),
   withMethods(({ commentsService, ...store }) => ({
     /**
@@ -96,7 +114,7 @@ export const CommentsStore = signalStore(
             if (response.success) {
               const currentComments = store.comments();
               const updatedComments = currentComments.map(c =>
-                c.id === id ? response.data : c
+                c.id === id ? { ...c, ...response.data } : c
               );
               patchState(store, {
                 comments: updatedComments,
@@ -125,7 +143,20 @@ export const CommentsStore = signalStore(
           tap((response) => {
             if (response.success) {
               const currentComments = store.comments();
-              const filteredComments = currentComments.filter(c => c.id !== id);
+              const commentsToDelete = new Set<number>([id]);
+              const queue = [id];
+
+              while (queue.length > 0) {
+                const parentId = queue.shift()!;
+                currentComments.forEach(comment => {
+                  if (comment.parentId === parentId) {
+                    commentsToDelete.add(comment.id);
+                    queue.push(comment.id);
+                  }
+                });
+              }
+
+              const filteredComments = currentComments.filter(c => !commentsToDelete.has(c.id));
               patchState(store, {
                 comments: filteredComments,
                 isLoading: false

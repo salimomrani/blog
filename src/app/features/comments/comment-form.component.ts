@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -15,6 +15,9 @@ import { AuthStore } from '../../store/auth.store';
 })
 export class CommentFormComponent {
   readonly articleId = input.required<number>();
+  readonly parentId = input<number | undefined>();
+
+  readonly commentSubmitted = output<void>();
 
   private readonly fb = inject(FormBuilder);
   readonly commentsStore = inject(CommentsStore);
@@ -34,10 +37,17 @@ export class CommentFormComponent {
 
     this.commentsStore.createComment({
       content: formValue.content,
-      articleId: this.articleId()
+      articleId: this.articleId(),
+      parentId: this.parentId()
     });
 
     // Reset form after submission
     this.form.reset();
+    this.commentSubmitted.emit();
+  }
+
+  protected onCancel(): void {
+    this.commentSubmitted.emit();
   }
 }
+
