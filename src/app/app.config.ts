@@ -13,6 +13,7 @@ import { authInterceptor } from './interceptors/auth.interceptor';
 import { unauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
 import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
 import { AuthStore } from './store/auth.store';
+import { noop } from 'rxjs';
 
 /**
  * Initialize authentication before app starts
@@ -22,7 +23,7 @@ import { AuthStore } from './store/auth.store';
 export function initializeAuth() {
   return () => {
     const authStore = inject(AuthStore);
-    return authStore.loadUserProfile().toPromise().catch(() => {});
+    return authStore.loadUserProfile().toPromise().catch(() => noop);
   };
 }
 
