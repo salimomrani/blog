@@ -1,7 +1,11 @@
-import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArticleSearchParams } from '../../services/articles.service';
+import { CategoriesService } from '../../services/categories.service';
+import { TagsService } from '../../services/tags.service';
+import { CategoryDto } from '../../shared/models/category.model';
+import { TagDto } from '../../shared/models/tag.model';
 
 @Component({
   selector: 'app-article-search',
@@ -11,21 +15,80 @@ import { ArticleSearchParams } from '../../services/articles.service';
   styleUrl: './article-search.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ArticleSearchComponent {
+export class ArticleSearchComponent implements OnInit {
   public readonly searchChange = output<ArticleSearchParams>();
   public readonly clearSearch = output<void>();
 
+  private readonly categoriesService = inject(CategoriesService);
+  private readonly tagsService = inject(TagsService);
+
   protected readonly searchQuery = signal<string>('');
+  protected readonly selectedCategoryId = signal<number | undefined>(undefined);
+  protected readonly selectedTagId = signal<number | undefined>(undefined);
+  protected readonly categories = signal<CategoryDto[]>([]);
+  protected readonly tags = signal<TagDto[]>([]);
+  protected readonly isLoadingFilters = signal<boolean>(false);
+
+  public ngOnInit(): void {
+    this.loadFilters();
+  }
+
+  private loadFilters(): void {
+    this.isLoadingFilters.set(true);
+
+    // Load categories
+    this.categoriesService.getAll().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.categories.set(response.data);
+        }
+      },
+      error: (error: unknown) => console.error('Failed to load categories:', error)
+    });
+
+    // Load tags
+    this.tagsService.getAll().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.tags.set(response.data);
+        }
+        this.isLoadingFilters.set(false);
+      },
+      error: (error: unknown) => {
+        console.error('Failed to load tags:', error);
+        this.isLoadingFilters.set(false);
+      }
+    });
+  }
 
   protected onSearch(): void {
+    const params: ArticleSearchParams = {};
+
     const query = this.searchQuery().trim();
     if (query) {
-      this.searchChange.emit({ query });
+      params.query = query;
+    }
+
+    const categoryId = this.selectedCategoryId();
+    if (categoryId) {
+      params.categoryId = categoryId;
+    }
+
+    const tagId = this.selectedTagId();
+    if (tagId) {
+      params.tagId = tagId;
+    }
+
+    // Only search if at least one filter is set
+    if (params.query || params.categoryId || params.tagId) {
+      this.searchChange.emit(params);
     }
   }
 
   protected onClear(): void {
     this.searchQuery.set('');
+    this.selectedCategoryId.set(undefined);
+    this.selectedTagId.set(undefined);
     this.clearSearch.emit();
   }
 
@@ -33,5 +96,11 @@ export class ArticleSearchComponent {
     if (event.key === 'Enter') {
       this.onSearch();
     }
+  }
+
+  protected hasActiveFilters(): boolean {
+    return !!this.searchQuery().trim() ||
+           this.selectedCategoryId() !== undefined ||
+           this.selectedTagId() !== undefined;
   }
 }
