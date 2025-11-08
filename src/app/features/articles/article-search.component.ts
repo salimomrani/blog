@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, output, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArticleSearchParams } from '../../services/articles.service';
@@ -16,8 +16,8 @@ import { TagDto } from '../../shared/models/tag.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArticleSearchComponent implements OnInit {
-  @Output() public readonly search = new EventEmitter<ArticleSearchParams>();
-  @Output() public readonly clearSearch = new EventEmitter<void>();
+  public readonly searchChange = output<ArticleSearchParams>();
+  public readonly clearSearch = output<void>();
 
   private readonly categoriesService = inject(CategoriesService);
   private readonly tagsService = inject(TagsService);
@@ -81,7 +81,7 @@ export class ArticleSearchComponent implements OnInit {
 
     // Only search if at least one filter is set
     if (params.query || params.categoryId || params.tagId) {
-      this.search.emit(params);
+      this.searchChange.emit(params);
     }
   }
 

@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState, withHooks, withProps } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState, withProps } from '@ngrx/signals';
 import { computed } from '@angular/core';
 import { AuthService, UserDto, RegisterRequestDto, ApiResponseAuthResponse, ApiResponseUserDto } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
@@ -139,15 +139,16 @@ export const AuthStore = signalStore(
 
     /**
      * Load user profile if token exists (on app init)
+     * Returns Observable that completes when loading finishes
      */
-    loadUserProfile(): void {
+    loadUserProfile(): Observable<void> {
       const token = store.accessToken();
       if (!token) {
-        return;
+        return EMPTY;
       }
 
       patchState(store, { isLoading: true, error: null });
-      authService.me().pipe(
+      return authService.me().pipe(
         tap((response: ApiResponseUserDto) => {
           if (!response.success) {
             throw new Error(response.message);
@@ -166,20 +167,10 @@ export const AuthStore = signalStore(
             refreshToken: null
           });
           return EMPTY;
-        })
-      ).subscribe();
+        }),
+        switchMap(() => EMPTY)
+      );
     }
-  })),
-  withHooks({
-    onInit(store) {
-      // Defer profile loading to avoid circular dependency
-      // Store is fully initialized at this point, but we need to wait for the microtask queue
-      queueMicrotask(() => {
-        if (store.accessToken()) {
-          store.loadUserProfile();
-        }
-      });
-    }
-  })
+  }))
 );
 

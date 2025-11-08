@@ -1,4 +1,7 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
+import {
+  ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode, inject,
+  provideAppInitializer
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
@@ -9,6 +12,20 @@ import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { unauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
 import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
+import { AuthStore } from './store/auth.store';
+import { noop } from 'rxjs';
+
+/**
+ * Initialize authentication before app starts
+ * Actively calls /me API to load user profile on page refresh
+ * This ensures all guards and services have correct auth state before navigation
+ */
+export function initializeAuth() {
+  return () => {
+    const authStore = inject(AuthStore);
+    return authStore.loadUserProfile().toPromise().catch(() => noop);
+  };
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,6 +41,8 @@ export const appConfig: ApplicationConfig = {
       autoPause: true,
       trace: false,
       traceLimit: 75,
-    })
+    }),
+    provideAppInitializer(initializeAuth()),
+
   ]
 };
