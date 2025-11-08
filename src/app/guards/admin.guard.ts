@@ -4,6 +4,7 @@ import { AuthStore } from '../store/auth.store';
 
 /**
  * Guard to restrict access to admin users only
+ * Note: Auth is guaranteed to be loaded via APP_INITIALIZER before navigation starts
  */
 export const adminGuard: CanActivateFn = () => {
   const authStore = inject(AuthStore);
