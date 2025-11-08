@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, output, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, output, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArticleSearchParams } from '../../services/articles.service';
@@ -28,6 +28,15 @@ export class ArticleSearchComponent implements OnInit {
   protected readonly categories = signal<CategoryDto[]>([]);
   protected readonly tags = signal<TagDto[]>([]);
   protected readonly isLoadingFilters = signal<boolean>(false);
+
+
+  readonly selectedCategory = computed(() =>
+    this.categories().find(c => c.id === this.selectedCategoryId())
+  );
+
+  readonly selectedTag = computed(() =>
+    this.tags().find(t => t.id === this.selectedTagId())
+  );
 
   public ngOnInit(): void {
     this.loadFilters();
