@@ -43,7 +43,7 @@ export class ArticleSearchComponent implements OnInit {
           this.categories.set(response.data);
         }
       },
-      error: (error) => console.error('Failed to load categories:', error)
+      error: (error: unknown) => console.error('Failed to load categories:', error)
     });
 
     // Load tags
@@ -54,7 +54,7 @@ export class ArticleSearchComponent implements OnInit {
         }
         this.isLoadingFilters.set(false);
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Failed to load tags:', error);
         this.isLoadingFilters.set(false);
       }
