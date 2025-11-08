@@ -13,16 +13,20 @@ import { AuthStore } from './store/auth.store';
 
 /**
  * Initialize authentication before app starts
- * This ensures all guards and services have correct auth state on page refresh
+ * Actively calls /me API to load user profile on page refresh
+ * This ensures all guards and services have correct auth state before navigation
  */
 function initializeAuth(): () => Promise<void> {
-  return async () => {
+  return () => {
     const authStore = inject(AuthStore);
 
-    // Wait for auth store to finish loading user profile
-    while (authStore.isLoading()) {
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
+    // Call /me API to load authenticated user profile
+    return new Promise<void>((resolve) => {
+      authStore.loadUserProfile().subscribe({
+        complete: () => resolve(),
+        error: () => resolve() // Resolve even on error to let app continue
+      });
+    });
   };
 }
 
