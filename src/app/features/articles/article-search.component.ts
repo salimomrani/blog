@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArticleSearchParams } from '../../services/articles.service';
@@ -12,15 +12,15 @@ import { ArticleSearchParams } from '../../services/articles.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ArticleSearchComponent {
-  @Output() public readonly search = new EventEmitter<ArticleSearchParams>();
-  @Output() public readonly clearSearch = new EventEmitter<void>();
+  public readonly searchChange = output<ArticleSearchParams>();
+  public readonly clearSearch = output<void>();
 
   protected readonly searchQuery = signal<string>('');
 
   protected onSearch(): void {
     const query = this.searchQuery().trim();
     if (query) {
-      this.search.emit({ query });
+      this.searchChange.emit({ query });
     }
   }
 
