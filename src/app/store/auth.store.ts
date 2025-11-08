@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState, withHooks, withProps } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState, withProps } from '@ngrx/signals';
 import { computed } from '@angular/core';
 import { AuthService, UserDto, RegisterRequestDto, ApiResponseAuthResponse, ApiResponseUserDto } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
