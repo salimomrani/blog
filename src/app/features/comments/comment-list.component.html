@@ -49,47 +49,104 @@
   <!-- Comments List -->
   @if (!commentsStore.isLoading() && commentsStore.hasComments()) {
     <div class="space-y-4">
-      @for (comment of commentsStore.comments(); track comment.id) {
-        <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition duration-150">
-          <!-- Comment Header -->
-          <div class="flex items-start justify-between mb-3">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <div class="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center text-white font-semibold">
-                  {{ comment.author.firstName.charAt(0) }}{{ comment.author.lastName.charAt(0) }}
+      @for (comment of commentsStore.nestedComments(); track trackByComment) {
+        <ng-template #commentTemplate let-comment="comment">
+          <div
+            [id]="'comment-' + comment.id"
+            class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition duration-150"
+            [class.border-l-2]="comment.parentId"
+            [class.border-blue-300]="comment.parentId"
+            [class.pl-2]="comment.parentId"
+          >
+            <!-- Parent Comment Link -->
+            @if (comment.parentId) {
+              <div class="mb-2 text-xs text-gray-500 flex items-center">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l3 3m-3-3l3-3"></path></svg>
+                <span class="text-gray-500">En réponse à un commentaire</span>
+              </div>
+            }
+
+            <!-- Comment Header -->
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center text-white font-semibold">
+                    {{ comment.author.firstName.charAt(0) }}{{ comment.author.lastName.charAt(0) }}
+                  </div>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm font-semibold text-gray-900">
+                    {{ comment.author.fullName }}
+                  </p>
+                  <p class="text-xs text-gray-500">
+                    {{ comment.createdAt | date:'dd/MM/yyyy à HH:mm' }}
+                  </p>
                 </div>
               </div>
-              <div class="ml-3">
-                <p class="text-sm font-semibold text-gray-900">
-                  {{ comment.author.fullName }}
-                </p>
-                <p class="text-xs text-gray-500">
-                  {{ comment.createdAt | date:'dd/MM/yyyy à HH:mm' }}
-                </p>
+
+              <!-- Actions -->
+              <div class="flex items-center space-x-2">
+                @if (authStore.isAuthenticated()) {
+                  <button
+                    (click)="toggleReply(comment.id)"
+                    class="text-blue-600 hover:text-blue-800 transition duration-150 text-sm"
+                    title="Répondre"
+                  >
+                    Répondre
+                  </button>
+                }
+                @if (authStore.isAuthenticated() && isCommentAuthor(comment.author.id)) {
+                  <button
+                    (click)="deleteComment(comment.id)"
+                    class="text-red-600 hover:text-red-800 transition duration-150"
+                    title="Supprimer le commentaire"
+                  >
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                }
               </div>
             </div>
 
-            <!-- Delete Button (only for comment author) -->
-            @if (authStore.isAuthenticated() && isCommentAuthor(comment.author.id)) {
-              <button
-                (click)="deleteComment(comment.id)"
-                class="text-red-600 hover:text-red-800 transition duration-150"
-                title="Supprimer le commentaire"
-              >
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
+            <!-- Comment Content -->
+            <div class="ml-13">
+              <p class="text-gray-700 text-sm leading-relaxed">
+                {{ comment.content }}
+              </p>
+            </div>
+
+            <!-- Reply Form -->
+            @if (replyingTo() === comment.id) {
+              <div class="mt-4 ml-4">
+                <app-comment-form
+                  [articleId]="articleId()"
+                  [parentId]="comment.id"
+                  (commentSubmitted)="onCommentSubmitted()"
+                />
+              </div>
+            }
+
+            <!-- Nested Replies -->
+            @if (comment.replies && comment.replies.length > 0) {
+              <div class="ml-8 mt-4 space-y-4">
+                @if (!shouldShowReplies(comment.id)) {
+                  <button (click)="toggleShowReplies(comment.id)" class="text-blue-600 hover:underline text-sm">
+                    Afficher {{ comment.replies.length }} réponses
+                  </button>
+                } @else {
+                  <button (click)="toggleShowReplies(comment.id)" class="text-blue-600 hover:underline text-sm">
+                    Masquer les réponses
+                  </button>
+                  @for (reply of comment.replies; track trackByComment) {
+                    <ng-container *ngTemplateOutlet="commentTemplate; context: { comment: reply }"></ng-container>
+                  }
+                }
+              </div>
             }
           </div>
-
-          <!-- Comment Content -->
-          <div class="ml-13">
-            <p class="text-gray-700 text-sm leading-relaxed">
-              {{ comment.content }}
-            </p>
-          </div>
-        </div>
+        </ng-template>
+        <ng-container *ngTemplateOutlet="commentTemplate; context: { comment: comment }"></ng-container>
       }
     </div>
   }
