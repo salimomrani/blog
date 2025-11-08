@@ -100,13 +100,13 @@
 
         @if (selectedCategoryId()) {
           <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
-            📁 {{ categories().find(c => c.id === selectedCategoryId())?.name }}
+            📁 {{ selectedCategory()?.name }}
           </span>
         }
 
         @if (selectedTagId()) {
           <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
-            #{{ tags().find(t => t.id === selectedTagId())?.name }}
+            #{{ selectedTag()?.name }}
           </span>
         }
       </div>
