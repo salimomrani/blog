@@ -7,12 +7,13 @@ import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
 import { MarkdownPipe } from '../../shared/pipes/markdown.pipe';
 import { CommentListComponent } from '../comments/comment-list.component';
 import { CommentFormComponent } from '../comments/comment-form.component';
-import { ShareComponent } from '../../shared/components';
+import { ShareComponent, SpinnerComponent, BadgeComponent, ConfirmationDialogComponent } from '../../shared/components';
+import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, IsAuthorPipe, MarkdownPipe, CommentListComponent, CommentFormComponent, ShareComponent],
+  imports: [CommonModule, RouterLink, IsAuthorPipe, MarkdownPipe, CommentListComponent, CommentFormComponent, ShareComponent, SpinnerComponent, BadgeComponent, ConfirmationDialogComponent],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -23,6 +24,8 @@ export class ArticleDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  protected readonly showDeleteDialog = signal(false);
+
   public ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
@@ -30,14 +33,21 @@ export class ArticleDetailComponent implements OnInit {
     }
   }
 
-  protected onDelete(): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) {
-      const id = this.articlesStore.selectedArticle()?.id;
-      if (id) {
-        this.articlesStore.deleteArticle(id);
-        setTimeout(() => this.router.navigate(['/articles']), 500);
-      }
+  protected onDeleteClick(): void {
+    this.showDeleteDialog.set(true);
+  }
+
+  protected onDeleteConfirmed(): void {
+    const id = this.articlesStore.selectedArticle()?.id;
+    if (id) {
+      this.articlesStore.deleteArticle(id);
+      setTimeout(() => this.router.navigate(['/articles']), 500);
     }
+    this.showDeleteDialog.set(false);
+  }
+
+  protected onDeleteCancelled(): void {
+    this.showDeleteDialog.set(false);
   }
 
   protected getArticleUrl(): string {

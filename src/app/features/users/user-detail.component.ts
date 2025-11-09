@@ -1,13 +1,16 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersStore } from '../../store/users.store';
 import { AuthStore } from '../../store/auth.store';
+import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
+import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-user-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SpinnerComponent, BadgeComponent, ConfirmationDialogComponent],
   templateUrl: './user-detail.component.html',
   styleUrl: './user-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -17,6 +20,8 @@ export class UserDetailComponent implements OnInit {
   readonly authStore = inject(AuthStore);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  protected readonly showDeleteDialog = signal(false);
 
   /**
    * Check if admin is viewing their own profile
@@ -34,13 +39,29 @@ export class UserDetailComponent implements OnInit {
     }
   }
 
-  protected onDelete(): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-      const id = this.usersStore.selectedUser()?.id;
-      if (id) {
-        this.usersStore.deleteUser(id);
-        setTimeout(() => this.router.navigate(['/users']), 500);
-      }
+  protected onDeleteClick(): void {
+    this.showDeleteDialog.set(true);
+  }
+
+  protected onDeleteConfirmed(): void {
+    const id = this.usersStore.selectedUser()?.id;
+    if (id) {
+      this.usersStore.deleteUser(id);
+      setTimeout(() => this.router.navigate(['/users']), 500);
+    }
+    this.showDeleteDialog.set(false);
+  }
+
+  protected onDeleteCancelled(): void {
+    this.showDeleteDialog.set(false);
+  }
+
+  protected getRoleVariant(role: string): 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' {
+    switch(role) {
+      case 'ADMIN': return 'danger';
+      case 'MODERATOR': return 'warning';
+      case 'USER': return 'success';
+      default: return 'secondary';
     }
   }
 }

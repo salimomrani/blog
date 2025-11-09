@@ -1,10 +1,7 @@
 <div class="container-custom py-12">
   @if (usersStore.isLoading()) {
     <div class="flex justify-center items-center py-12">
-      <svg class="animate-spin h-12 w-12 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
+      <app-spinner [size]="'large'" [color]="'primary'" />
     </div>
   }
 
@@ -34,25 +31,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 py-6 border-t">
           <div>
             <h3 class="text-sm font-semibold text-gray-500 mb-1">Rôle</h3>
-            <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full"
-              [class.bg-red-100]="user.role === 'ADMIN'"
-              [class.text-red-800]="user.role === 'ADMIN'"
-              [class.bg-yellow-100]="user.role === 'MODERATOR'"
-              [class.text-yellow-800]="user.role === 'MODERATOR'"
-              [class.bg-green-100]="user.role === 'USER'"
-              [class.text-green-800]="user.role === 'USER'">
-              {{ user.role }}
-            </span>
+            <app-badge [text]="user.role" [variant]="getRoleVariant(user.role)" [size]="'small'" [rounded]="true" />
           </div>
           <div>
             <h3 class="text-sm font-semibold text-gray-500 mb-1">Statut</h3>
-            <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full"
-              [class.bg-green-100]="user.active"
-              [class.text-green-800]="user.active"
-              [class.bg-gray-100]="!user.active"
-              [class.text-gray-800]="!user.active">
-              {{ user.active ? 'Actif' : 'Inactif' }}
-            </span>
+            <app-badge [text]="user.active ? 'Actif' : 'Inactif'" [variant]="user.active ? 'success' : 'warning'" [size]="'small'" [rounded]="true" />
           </div>
           @if (user.phone) {
             <div>
@@ -88,7 +71,7 @@
             </a>
             @if (!isViewingSelf()) {
               <button
-                (click)="onDelete()"
+                (click)="onDeleteClick()"
                 class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-150"
               >
                 Supprimer
@@ -103,5 +86,16 @@
         }
       </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <app-confirmation-dialog
+      [isOpen]="showDeleteDialog()"
+      [title]="'Confirmer la suppression'"
+      [message]="'Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.'"
+      [confirmText]="'Supprimer'"
+      [cancelText]="'Annuler'"
+      (confirmed)="onDeleteConfirmed()"
+      (cancelled)="onDeleteCancelled()"
+    />
   }
 </div>
