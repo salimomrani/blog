@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CategoriesStore } from '../../store/categories.store';
 import { TagsStore } from '../../store/tags.store';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog.component';
 
 @Component({
   selector: 'app-categories-tags-management',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, ConfirmationDialogComponent],
   templateUrl: './categories-tags-management.component.html',
   styleUrl: './categories-tags-management.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,6 +30,22 @@ export class CategoriesTagsManagementComponent implements OnInit {
 
   protected editingCategoryId: number | null = null;
   protected editingTagId: number | null = null;
+
+  protected readonly showDeleteCategoryDialog = signal(false);
+  protected readonly categoryToDelete = signal<{ id: number; name: string } | null>(null);
+  protected readonly categoryDeleteMessage = computed(() => {
+    const category = this.categoryToDelete();
+    return category
+      ? `Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ?`
+      : '';
+  });
+
+  protected readonly showDeleteTagDialog = signal(false);
+  protected readonly tagToDelete = signal<{ id: number; name: string } | null>(null);
+  protected readonly tagDeleteMessage = computed(() => {
+    const tag = this.tagToDelete();
+    return tag ? `Êtes-vous sûr de vouloir supprimer le tag "${tag.name}" ?` : '';
+  });
 
   public ngOnInit(): void {
     this.categoriesStore.loadCategories();
@@ -68,9 +85,22 @@ export class CategoriesTagsManagementComponent implements OnInit {
   }
 
   protected deleteCategory(id: number, name: string): void {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer la catégorie "${name}" ?`)) {
-      this.categoriesStore.deleteCategory(id);
+    this.categoryToDelete.set({ id, name });
+    this.showDeleteCategoryDialog.set(true);
+  }
+
+  protected onDeleteCategoryConfirmed(): void {
+    const category = this.categoryToDelete();
+    if (category !== null) {
+      this.categoriesStore.deleteCategory(category.id);
     }
+    this.showDeleteCategoryDialog.set(false);
+    this.categoryToDelete.set(null);
+  }
+
+  protected onDeleteCategoryCancelled(): void {
+    this.showDeleteCategoryDialog.set(false);
+    this.categoryToDelete.set(null);
   }
 
   // Tag methods
@@ -106,8 +136,21 @@ export class CategoriesTagsManagementComponent implements OnInit {
   }
 
   protected deleteTag(id: number, name: string): void {
-    if (confirm(`Êtes-vous sûr de vouloir supprimer le tag "${name}" ?`)) {
-      this.tagsStore.deleteTag(id);
+    this.tagToDelete.set({ id, name });
+    this.showDeleteTagDialog.set(true);
+  }
+
+  protected onDeleteTagConfirmed(): void {
+    const tag = this.tagToDelete();
+    if (tag !== null) {
+      this.tagsStore.deleteTag(tag.id);
     }
+    this.showDeleteTagDialog.set(false);
+    this.tagToDelete.set(null);
+  }
+
+  protected onDeleteTagCancelled(): void {
+    this.showDeleteTagDialog.set(false);
+    this.tagToDelete.set(null);
   }
 }
