@@ -46,7 +46,7 @@ describe('ShareComponent', () => {
     const shareSpy = jest.fn();
     component.shared.subscribe(shareSpy);
 
-    const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation();
+    const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
 
     component.shareOnTwitter();
 
@@ -60,7 +60,7 @@ describe('ShareComponent', () => {
     const shareSpy = jest.fn();
     component.shared.subscribe(shareSpy);
 
-    const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation();
+    const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
 
     component.shareOnFacebook();
 
@@ -74,7 +74,7 @@ describe('ShareComponent', () => {
     const shareSpy = jest.fn();
     component.shared.subscribe(shareSpy);
 
-    const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation();
+    const windowOpenSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
 
     component.shareOnLinkedIn();
 
@@ -90,36 +90,43 @@ describe('ShareComponent', () => {
 
     fixture.componentRef.setInput('url', 'https://example.com');
 
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: jest.fn().mockResolvedValue(undefined)
-      }
+    const writeTextMock = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: writeTextMock
+      },
+      writable: true,
+      configurable: true
     });
 
     await component.copyLink();
 
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith('https://example.com');
+    expect(writeTextMock).toHaveBeenCalledWith('https://example.com');
     expect(shareSpy).toHaveBeenCalledWith('copy');
     expect(component['copySuccess']).toBe(true);
   });
 
-  it('should reset copySuccess after timeout', (done) => {
+  it('should reset copySuccess after timeout', async () => {
+    jest.useFakeTimers();
+
     fixture.componentRef.setInput('url', 'https://example.com');
 
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: jest.fn().mockResolvedValue(undefined)
-      }
+    const writeTextMock = jest.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      value: {
+        writeText: writeTextMock
+      },
+      writable: true,
+      configurable: true
     });
 
-    component.copyLink().then(() => {
-      expect(component['copySuccess']).toBe(true);
+    await component.copyLink();
+    expect(component['copySuccess']).toBe(true);
 
-      setTimeout(() => {
-        expect(component['copySuccess']).toBe(false);
-        done();
-      }, 2100);
-    });
+    jest.advanceTimersByTime(2000);
+    expect(component['copySuccess']).toBe(false);
+
+    jest.useRealTimers();
   });
 
   it('should apply correct size classes', () => {
