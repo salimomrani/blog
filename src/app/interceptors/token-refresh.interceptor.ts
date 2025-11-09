@@ -1,13 +1,16 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, switchMap, throwError, BehaviorSubject, filter, take } from 'rxjs';
+import { catchError, switchMap, throwError, take } from 'rxjs';
 import { AuthStore } from '../store/auth.store';
 import { AuthService } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
+import { TokenRefreshService } from '../services/token-refresh.service';
 
 /**
  * Interceptor to handle token refresh on 401 Unauthorized responses
+ *
+ * Uses Angular Signals via TokenRefreshService to manage refresh state.
  *
  * When a request fails with 401:
  * 1. Checks if refresh token exists
@@ -20,10 +23,7 @@ export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(AuthStore);
   const authService = inject(AuthService);
   const storageService = inject(StorageService);
-
-  // BehaviorSubject to track if a token refresh is in progress
-  const isRefreshing$ = new BehaviorSubject<boolean>(false);
-  const refreshedToken$ = new BehaviorSubject<string | null>(null);
+  const tokenRefreshService = inject(TokenRefreshService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -56,20 +56,19 @@ export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // If already refreshing, wait for the new token
-      if (isRefreshing$.value) {
-        return refreshedToken$.pipe(
-          filter(token => token !== null),
+      if (tokenRefreshService.isCurrentlyRefreshing()) {
+        return tokenRefreshService.refreshedToken$.pipe(
           take(1),
           switchMap(token => {
             // Retry the request with the new token
-            const clonedReq = addTokenToRequest(req, token!);
+            const clonedReq = addTokenToRequest(req, token);
             return next(clonedReq);
           })
         );
       }
 
       // Mark as refreshing
-      isRefreshing$.next(true);
+      tokenRefreshService.startRefreshing();
 
       // Attempt to refresh the token
       return authService.refresh(refreshToken).pipe(
@@ -90,17 +89,15 @@ export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
           authStore.updateTokens(accessToken, newRefreshToken ?? refreshToken);
 
           // Mark refreshing as complete and emit new token
-          isRefreshing$.next(false);
-          refreshedToken$.next(accessToken);
+          tokenRefreshService.completeRefresh(accessToken);
 
           // Retry the original request with the new token
           const clonedReq = addTokenToRequest(req, accessToken);
           return next(clonedReq);
         }),
         catchError((refreshError) => {
-          // Refresh failed, logout the user
-          isRefreshing$.next(false);
-          refreshedToken$.next(null);
+          // Refresh failed, mark as failed and logout the user
+          tokenRefreshService.failRefresh();
 
           authStore.logout();
           router.navigate(['/auth/login'], {
