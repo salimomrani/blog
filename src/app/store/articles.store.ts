@@ -5,6 +5,7 @@ import { pipe, tap, switchMap, catchError, EMPTY } from 'rxjs';
 import { computed } from '@angular/core';
 import { ArticleDto, CreateArticleRequest, UpdateArticleRequest } from '../models/article.model';
 import { ArticlesService, ArticleSearchParams } from '../services/articles.service';
+import { LikesService } from '../services/likes.service';
 
 export interface ArticlesState {
   articles: ArticleDto[];
@@ -27,13 +28,14 @@ export const ArticlesStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withProps(() => ({
-    articlesService: inject(ArticlesService)
+    articlesService: inject(ArticlesService),
+    likesService: inject(LikesService)
   })),
   withComputed((state) => ({
     articlesCount: computed(() => state.articles().length),
     hasArticles: computed(() => state.articles().length > 0)
   })),
-  withMethods(({ articlesService, ...store }) => ({
+  withMethods(({ articlesService, likesService, ...store }) => ({
     /**
      * Load all articles
      */
@@ -195,6 +197,63 @@ export const ArticlesStore = signalStore(
             return EMPTY;
           })
         ))
+      )
+    ),
+
+    /**
+     * Toggle like on an article
+     */
+    toggleLike: rxMethod<number>(
+      pipe(
+        switchMap((articleId) => {
+          // Find the article in the list or use selectedArticle
+          const currentArticles = store.articles();
+          const article = currentArticles.find(a => a.id === articleId) ?? store.selectedArticle();
+
+          if (!article) {
+            return EMPTY;
+          }
+
+          const isLiked = article.isLikedByCurrentUser;
+          const operation = isLiked
+            ? likesService.unlikeArticle(articleId)
+            : likesService.likeArticle(articleId);
+
+          return operation.pipe(
+            tap(() => {
+              // Update the article in the articles list
+              const updatedArticles = currentArticles.map(a => {
+                if (a.id === articleId) {
+                  return {
+                    ...a,
+                    likesCount: isLiked ? a.likesCount - 1 : a.likesCount + 1,
+                    isLikedByCurrentUser: !isLiked
+                  };
+                }
+                return a;
+              });
+
+              // Update selectedArticle if it's the same article
+              const updatedSelectedArticle = store.selectedArticle()?.id === articleId
+                ? {
+                    ...store.selectedArticle()!,
+                    likesCount: isLiked ? store.selectedArticle()!.likesCount - 1 : store.selectedArticle()!.likesCount + 1,
+                    isLikedByCurrentUser: !isLiked
+                  }
+                : store.selectedArticle();
+
+              patchState(store, {
+                articles: updatedArticles,
+                selectedArticle: updatedSelectedArticle
+              });
+            }),
+            catchError((error) => {
+              const errorMessage = error?.error?.message ?? error?.message ?? 'Erreur lors de la mise à jour du like';
+              patchState(store, { error: errorMessage });
+              return EMPTY;
+            })
+          );
+        })
       )
     ),
 

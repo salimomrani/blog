@@ -8,12 +8,13 @@ import { MarkdownPipe } from '../../shared/pipes/markdown.pipe';
 import { CommentListComponent } from '../comments/comment-list.component';
 import { CommentFormComponent } from '../comments/comment-form.component';
 import { ShareComponent, SpinnerComponent, BadgeComponent, ConfirmationDialogComponent } from '../../shared/components';
+import { ArticleLikeButtonComponent } from '../../shared/components/article-like-button/article-like-button.component';
 import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, IsAuthorPipe, MarkdownPipe, CommentListComponent, CommentFormComponent, ShareComponent, SpinnerComponent, BadgeComponent, ConfirmationDialogComponent],
+  imports: [CommonModule, RouterLink, IsAuthorPipe, MarkdownPipe, CommentListComponent, CommentFormComponent, ShareComponent, SpinnerComponent, BadgeComponent, ConfirmationDialogComponent, ArticleLikeButtonComponent],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
