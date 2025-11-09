@@ -48,7 +48,7 @@
 
   <!-- Error Message -->
   @if (usersStore.error()) {
-    <app-error-message [message]="usersStore.error()" [type]="'error'" />
+    <app-error-message [message]="usersStore.error() || ''" [type]="'error'" />
   }
 
   <!-- Loading State -->

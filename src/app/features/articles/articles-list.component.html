@@ -27,7 +27,7 @@
   <!-- Error Message -->
   @if (articlesStore.error()) {
     <div class="mb-6">
-      <app-error-message [message]="articlesStore.error()" [type]="'error'" />
+      <app-error-message [message]="articlesStore.error() || ''" [type]="'error'" />
     </div>
   }
 
