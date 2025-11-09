@@ -107,6 +107,16 @@ export class ArticleSearchComponent implements OnInit {
     }
   }
 
+  protected onCategoryChange(value: string): void {
+    this.selectedCategoryId.set(value === '' ? undefined : +value);
+    this.onSearch();
+  }
+
+  protected onTagChange(value: string): void {
+    this.selectedTagId.set(value === '' ? undefined : +value);
+    this.onSearch();
+  }
+
   protected hasActiveFilters(): boolean {
     return !!this.searchQuery().trim() ||
            this.selectedCategoryId() !== undefined ||
