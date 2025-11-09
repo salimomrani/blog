@@ -7,11 +7,12 @@ import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
 import { MarkdownPipe } from '../../shared/pipes/markdown.pipe';
 import { CommentListComponent } from '../comments/comment-list.component';
 import { CommentFormComponent } from '../comments/comment-form.component';
+import { ShareComponent } from '../../shared/components';
 
 @Component({
   selector: 'app-article-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, IsAuthorPipe, MarkdownPipe, CommentListComponent, CommentFormComponent],
+  imports: [CommonModule, RouterLink, IsAuthorPipe, MarkdownPipe, CommentListComponent, CommentFormComponent, ShareComponent],
   templateUrl: './article-detail.component.html',
   styleUrl: './article-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,5 +38,9 @@ export class ArticleDetailComponent implements OnInit {
         setTimeout(() => this.router.navigate(['/articles']), 500);
       }
     }
+  }
+
+  protected getArticleUrl(): string {
+    return window.location.href;
   }
 }

@@ -130,6 +130,17 @@
               <span>{{ article.createdAt | date:'dd/MM/yyyy' }}</span>
             </div>
 
+            <!-- Share -->
+            <div class="mb-4">
+              <app-share
+                [title]="article.title"
+                [url]="getArticleUrl(article.id)"
+                [description]="article.content | textExcerpt:150"
+                [showLabels]="false"
+                [size]="'small'"
+              />
+            </div>
+
             <!-- Actions -->
             <div class="flex gap-2">
               <a
