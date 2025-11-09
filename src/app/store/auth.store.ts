@@ -170,6 +170,13 @@ export const AuthStore = signalStore(
         }),
         switchMap(() => EMPTY)
       );
+    },
+
+    /**
+     * Update tokens in the store (used by token refresh interceptor)
+     */
+    updateTokens(accessToken: string, refreshToken: string): void {
+      patchState(store, { accessToken, refreshToken });
     }
   }))
 );
