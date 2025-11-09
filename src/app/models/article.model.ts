@@ -23,7 +23,7 @@ export interface ArticleDto {
   createdAt: string;
   updatedAt: string;
   likesCount: number;
-  isLikedByCurrentUser: boolean;
+  likedByCurrentUser: boolean;
 }
 
 export interface CreateArticleRequest {
