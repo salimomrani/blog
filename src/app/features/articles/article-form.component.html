@@ -50,83 +50,19 @@
           }
         </div>
 
-        <!-- Editor Mode Toggle -->
-        <div class="flex items-center justify-between mb-4">
-          <div class="block text-sm font-semibold text-gray-700">
-            Mode d'édition
+        <!-- Content - Markdown Editor with Preview -->
+        <div>
+          <div class="block text-sm font-semibold text-gray-700 mb-2">
+            Contenu Markdown
           </div>
-          <div class="inline-flex rounded-lg border border-gray-300 p-1 bg-gray-50">
-            <button
-              type="button"
-              (click)="toggleEditorMode()"
-              [class.bg-white]="editorMode() === 'rich'"
-              [class.shadow-sm]="editorMode() === 'rich'"
-              [class.text-purple-600]="editorMode() === 'rich'"
-              [class.text-gray-600]="editorMode() !== 'rich'"
-              class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-150"
-            >
-              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Éditeur riche
-            </button>
-            <button
-              type="button"
-              (click)="toggleEditorMode()"
-              [class.bg-white]="editorMode() === 'markdown'"
-              [class.shadow-sm]="editorMode() === 'markdown'"
-              [class.text-purple-600]="editorMode() === 'markdown'"
-              [class.text-gray-600]="editorMode() !== 'markdown'"
-              class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-150"
-            >
-              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
-              Markdown
-            </button>
-          </div>
-        </div>
-
-        <!-- Content - Rich Editor Mode -->
-        @if (editorMode() === 'rich') {
-          <div>
-            <label for="content" class="block text-sm font-semibold text-gray-700 mb-2">
-              Contenu
-            </label>
-            <quill-editor
-              formControlName="content"
-              [modules]="quillModules"
-              [styles]="{height: '400px'}"
-              placeholder="Écrivez votre article ici... Vous pouvez ajouter des images, du texte formaté, des liens et plus encore."
-              [class.border-red-500]="form.controls.content.touched && form.controls.content.invalid"
-            ></quill-editor>
-            @if (form.controls.content.touched && form.controls.content.invalid) {
-              <p class="mt-2 text-sm text-red-600">
-                @if (form.controls.content.errors?.['required']) {
-                  Le contenu est requis
-                }
-                @if (form.controls.content.errors?.['minlength']) {
-                  Minimum 10 caractères
-                }
-              </p>
-            }
-          </div>
-        }
-
-        <!-- Content - Markdown Editor Mode with Preview -->
-        @if (editorMode() === 'markdown') {
-          <div>
-            <div class="block text-sm font-semibold text-gray-700 mb-2">
-              Contenu Markdown
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Markdown Editor -->
-              <div>
-                <div class="text-xs text-gray-500 mb-2 font-medium">Éditeur</div>
-                <textarea
-                  formControlName="content"
-                  rows="20"
-                  placeholder="# Titre de l'article
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Markdown Editor -->
+            <div>
+              <div class="text-xs text-gray-500 mb-2 font-medium">Éditeur</div>
+              <textarea
+                formControlName="content"
+                rows="20"
+                placeholder="# Titre de l'article
 
 Écrivez votre article en **markdown** ici...
 
@@ -141,35 +77,34 @@ const hello = 'world';
 \`\`\`
 
 [Lien](https://exemple.com)"
-                  class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 font-mono text-sm resize-none"
-                  [class.border-red-500]="form.controls.content.touched && form.controls.content.invalid"
-                ></textarea>
-                @if (form.controls.content.touched && form.controls.content.invalid) {
-                  <p class="mt-2 text-sm text-red-600">
-                    @if (form.controls.content.errors?.['required']) {
-                      Le contenu est requis
-                    }
-                    @if (form.controls.content.errors?.['minlength']) {
-                      Minimum 10 caractères
-                    }
-                  </p>
-                }
-              </div>
-
-              <!-- Markdown Preview -->
-              <div>
-                <div class="text-xs text-gray-500 mb-2 font-medium">Prévisualisation en temps réel</div>
-                <div class="border border-gray-300 rounded-lg p-4 bg-white overflow-auto prose prose-purple max-w-none" style="min-height: 500px; max-height: 500px;">
-                  @if (form.controls.content.value) {
-                    <markdown [data]="form.controls.content.value"></markdown>
-                  } @else {
-                    <p class="text-gray-400 italic">La prévisualisation apparaîtra ici...</p>
+                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 font-mono text-sm resize-none"
+                [class.border-red-500]="form.controls.content.touched && form.controls.content.invalid"
+              ></textarea>
+              @if (form.controls.content.touched && form.controls.content.invalid) {
+                <p class="mt-2 text-sm text-red-600">
+                  @if (form.controls.content.errors?.['required']) {
+                    Le contenu est requis
                   }
-                </div>
+                  @if (form.controls.content.errors?.['minlength']) {
+                    Minimum 10 caractères
+                  }
+                </p>
+              }
+            </div>
+
+            <!-- Markdown Preview -->
+            <div>
+              <div class="text-xs text-gray-500 mb-2 font-medium">Prévisualisation en temps réel</div>
+              <div class="border border-gray-300 rounded-lg p-4 bg-white overflow-auto prose prose-purple max-w-none" style="min-height: 500px; max-height: 500px;">
+                @if (form.controls.content.value) {
+                  <markdown [data]="form.controls.content.value"></markdown>
+                } @else {
+                  <p class="text-gray-400 italic">La prévisualisation apparaîtra ici...</p>
+                }
               </div>
             </div>
           </div>
-        }
+        </div>
 
         <!-- Categories -->
         <div>
