@@ -215,7 +215,7 @@ export const ArticlesStore = signalStore(
             return EMPTY;
           }
 
-          const isLiked = article.isLikedByCurrentUser;
+          const isLiked = article.likedByCurrentUser;
           const operation = isLiked
             ? likesService.unlikeArticle(articleId)
             : likesService.likeArticle(articleId);
@@ -232,7 +232,7 @@ export const ArticlesStore = signalStore(
                   return {
                     ...a,
                     likesCount: isLiked ? a.likesCount - 1 : a.likesCount + 1,
-                    isLikedByCurrentUser: !isLiked
+                    likedByCurrentUser: !isLiked
                   };
                 }
                 return a;
@@ -243,7 +243,7 @@ export const ArticlesStore = signalStore(
                 ? {
                     ...latestSelectedArticle,
                     likesCount: isLiked ? latestSelectedArticle.likesCount - 1 : latestSelectedArticle.likesCount + 1,
-                    isLikedByCurrentUser: !isLiked
+                    likedByCurrentUser: !isLiked
                   }
                 : latestSelectedArticle;
 
