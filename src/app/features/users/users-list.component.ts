@@ -4,9 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UsersStore } from '../../store/users.store';
 import { AuthStore } from '../../store/auth.store';
-import { SpinnerComponent } from '../../shared/components/spinner/spinner.component';
-import { ErrorMessageComponent } from '../../shared/components/error-message/error-message.component';
-import { BadgeComponent } from '../../shared/components/badge/badge.component';
+import { SpinnerComponent, ErrorMessageComponent, BadgeComponent } from '../../shared/components';
 
 @Component({
   selector: 'app-users-list',

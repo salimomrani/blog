@@ -49,8 +49,8 @@ export class ShareComponent {
     this.shared.emit('email');
   }
 
-  public copyLink(): void {
-    navigator.clipboard.writeText(this.url()).then(() => {
+  public copyLink(): Promise<void> {
+    return navigator.clipboard.writeText(this.url()).then(() => {
       this.copySuccess = true;
       this.shared.emit('copy');
 
@@ -61,7 +61,7 @@ export class ShareComponent {
       this.copySuccessTimeout = setTimeout(() => {
         this.copySuccess = false;
       }, 2000);
-    }).catch((error) => {
+    }).catch((error: Error) => {
       console.error('Failed to copy link:', error);
     });
   }
