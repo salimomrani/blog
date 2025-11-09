@@ -1,10 +1,12 @@
 import { Component, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ArticlesStore } from '../../../store/articles.store';
+import { AuthStore } from '../../../store/auth.store';
 
 /**
  * Component for displaying and managing article likes
- * Shows the number of likes and allows users to like/unlike articles
+ * Shows the number of likes and allows authenticated users to like/unlike articles
+ * Non-authenticated users can only view the like count
  */
 @Component({
   selector: 'app-article-like-button',
@@ -15,6 +17,7 @@ import { ArticlesStore } from '../../../store/articles.store';
 })
 export class ArticleLikeButtonComponent {
   protected readonly store = inject(ArticlesStore);
+  protected readonly authStore = inject(AuthStore);
 
   /**
    * The ID of the article
@@ -33,8 +36,11 @@ export class ArticleLikeButtonComponent {
 
   /**
    * Toggle like/unlike for this article
+   * Only works for authenticated users
    */
   protected onToggleLike(): void {
-    this.store.toggleLike(this.articleId());
+    if (this.authStore.isAuthenticated()) {
+      this.store.toggleLike(this.articleId());
+    }
   }
 }
