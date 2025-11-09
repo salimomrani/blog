@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,11 +6,12 @@ import { ArticlesStore } from '../../store/articles.store';
 import { CategoriesStore } from '../../store/categories.store';
 import { TagsStore } from '../../store/tags.store';
 import { QuillModule } from 'ngx-quill';
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
   selector: 'app-article-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, QuillModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, QuillModule, MarkdownModule],
   templateUrl: './article-form.component.html',
   styleUrl: './article-form.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -32,6 +33,11 @@ export class ArticleFormComponent implements OnInit {
 
   protected isEditMode = false;
   protected articleId: number | null = null;
+
+  /**
+   * Editor mode: 'rich' for Quill editor, 'markdown' for markdown with preview
+   */
+  protected readonly editorMode = signal<'rich' | 'markdown'>('markdown');
 
   /**
    * Quill editor configuration with rich formatting options
@@ -111,6 +117,10 @@ export class ArticleFormComponent implements OnInit {
 
   protected isTagSelected(tagId: number): boolean {
     return this.form.controls.tagIds.value.includes(tagId);
+  }
+
+  protected toggleEditorMode(): void {
+    this.editorMode.set(this.editorMode() === 'rich' ? 'markdown' : 'rich');
   }
 
   protected onSubmit(): void {
