@@ -1,0 +1,42 @@
+<div class="error-message"
+     [class.error-message-error]="type === 'error'"
+     [class.error-message-warning]="type === 'warning'"
+     [class.error-message-info]="type === 'info'"
+     role="alert"
+     aria-live="assertive">
+  <div class="error-message-content">
+    <div class="error-message-icon">
+      @if (type === 'error') {
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="currentColor"/>
+        </svg>
+      }
+      @if (type === 'warning') {
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"/>
+        </svg>
+      }
+      @if (type === 'info') {
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
+        </svg>
+      }
+    </div>
+    <div class="error-message-text">
+      @if (title) {
+        <h3 class="error-message-title">{{ title }}</h3>
+      }
+      <p class="error-message-description">{{ message }}</p>
+    </div>
+  </div>
+  @if (dismissible) {
+    <button type="button"
+            class="error-message-close"
+            (click)="onDismiss()"
+            aria-label="Dismiss message">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M15 5L5 15M5 5l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  }
+</div>
