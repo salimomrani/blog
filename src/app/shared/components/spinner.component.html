@@ -1,0 +1,16 @@
+<div class="spinner-container">
+  <div class="spinner" [class.spinner-small]="size() === 'small'"
+       [class.spinner-medium]="size() === 'medium'"
+       [class.spinner-large]="size() === 'large'"
+       [class.spinner-primary]="color() === 'primary'"
+       [class.spinner-secondary]="color() === 'secondary'"
+       [class.spinner-white]="color() === 'white'"
+       role="status"
+       aria-live="polite"
+       [attr.aria-label]="message() || 'Loading'">
+    <div class="spinner-circle"></div>
+  </div>
+  @if (message()) {
+    <p class="spinner-message">{{ message() }}</p>
+  }
+</div>

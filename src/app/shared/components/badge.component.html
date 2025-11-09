@@ -1,0 +1,13 @@
+<span class="badge"
+      [class.badge-primary]="variant() === 'primary'"
+      [class.badge-secondary]="variant() === 'secondary'"
+      [class.badge-success]="variant() === 'success'"
+      [class.badge-danger]="variant() === 'danger'"
+      [class.badge-warning]="variant() === 'warning'"
+      [class.badge-info]="variant() === 'info'"
+      [class.badge-small]="size() === 'small'"
+      [class.badge-medium]="size() === 'medium'"
+      [class.badge-large]="size() === 'large'"
+      [class.badge-rounded]="rounded()">
+  {{ text() }}
+</span>
