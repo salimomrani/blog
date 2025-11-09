@@ -4,6 +4,7 @@ import { ArticlesListComponent } from './articles-list.component';
 import { ArticlesStore } from '../../store/articles.store';
 import { AuthStore } from '../../store/auth.store';
 import { signal } from '@angular/core';
+import { ArticleSearchParams } from '../../services/articles.service';
 
 describe('ArticlesListComponent', () => {
   let component: ArticlesListComponent;
@@ -18,7 +19,8 @@ describe('ArticlesListComponent', () => {
       error: signal(null),
       hasArticles: signal(false),
       articlesCount: signal(0),
-      loadArticles: jest.fn()
+      loadArticles: jest.fn(),
+      searchArticles: jest.fn()
     };
 
     mockAuthStore = {
@@ -44,6 +46,17 @@ describe('ArticlesListComponent', () => {
 
   it('should load articles on init', () => {
     fixture.detectChanges();
+    expect(mockStore.loadArticles).toHaveBeenCalled();
+  });
+
+  it('should call searchArticles when onSearch is triggered', () => {
+    const params: ArticleSearchParams = { query: 'test' };
+    component.onSearch(params);
+    expect(mockStore.searchArticles).toHaveBeenCalledWith(params);
+  });
+
+  it('should call loadArticles when onClearSearch is triggered', () => {
+    component.onClearSearch();
     expect(mockStore.loadArticles).toHaveBeenCalled();
   });
 
