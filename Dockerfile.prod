@@ -1,0 +1,15 @@
+# Production Dockerfile - uses pre-built artifacts from CI
+# This skips the npm build step entirely, making it much faster
+FROM nginx:alpine
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy pre-built application from CI artifacts
+COPY dist/blog/browser /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

@@ -3,13 +3,13 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (better layer caching)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (this layer is cached unless package.json changes)
+RUN npm ci --prefer-offline --no-audit
 
-# Copy source code
+# Copy source code (only invalidates cache when source changes)
 COPY . .
 
 # Build the application for production
