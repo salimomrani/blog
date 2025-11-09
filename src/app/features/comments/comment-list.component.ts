@@ -4,11 +4,12 @@ import { CommentsStore } from '../../store/comments.store';
 import { AuthStore } from '../../store/auth.store';
 import { CommentFormComponent } from './comment-form.component';
 import { CommentDto } from '../../shared/models/comment.model';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog.component';
 
 @Component({
   selector: 'app-comment-list',
   standalone: true,
-  imports: [CommonModule, CommentFormComponent],
+  imports: [CommonModule, CommentFormComponent, ConfirmationDialogComponent],
   templateUrl: './comment-list.component.html',
   styleUrl: './comment-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -21,15 +22,30 @@ export class CommentListComponent implements OnInit {
 
   readonly replyingTo = signal<number | null>(null);
   readonly showRepliesForCommentIds = signal(new Set<number>());
+  protected readonly showDeleteDialog = signal(false);
+  protected readonly commentToDelete = signal<number | null>(null);
 
   public ngOnInit(): void {
     this.commentsStore.loadCommentsByArticleId(this.articleId());
   }
 
   public deleteComment(commentId: number): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible et supprimera également toutes les réponses.')) {
+    this.commentToDelete.set(commentId);
+    this.showDeleteDialog.set(true);
+  }
+
+  protected onDeleteConfirmed(): void {
+    const commentId = this.commentToDelete();
+    if (commentId !== null) {
       this.commentsStore.deleteComment(commentId);
     }
+    this.showDeleteDialog.set(false);
+    this.commentToDelete.set(null);
+  }
+
+  protected onDeleteCancelled(): void {
+    this.showDeleteDialog.set(false);
+    this.commentToDelete.set(null);
   }
 
   public isCommentAuthor(authorId: number): boolean {

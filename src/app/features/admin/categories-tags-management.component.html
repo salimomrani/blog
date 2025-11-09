@@ -227,5 +227,29 @@
         Retour à l'accueil
       </a>
     </div>
+
+    <!-- Category Delete Confirmation Dialog -->
+    <app-confirmation-dialog
+      [(isOpen)]="showDeleteCategoryDialog"
+      [title]="'Confirmer la suppression'"
+      [message]="categoryDeleteMessage()"
+      [confirmText]="'Supprimer'"
+      [cancelText]="'Annuler'"
+      [confirmButtonType]="'danger'"
+      (confirmed)="onDeleteCategoryConfirmed()"
+      (cancelled)="onDeleteCategoryCancelled()"
+    />
+
+    <!-- Tag Delete Confirmation Dialog -->
+    <app-confirmation-dialog
+      [(isOpen)]="showDeleteTagDialog"
+      [title]="'Confirmer la suppression'"
+      [message]="tagDeleteMessage()"
+      [confirmText]="'Supprimer'"
+      [cancelText]="'Annuler'"
+      [confirmButtonType]="'danger'"
+      (confirmed)="onDeleteTagConfirmed()"
+      (cancelled)="onDeleteTagCancelled()"
+    />
   </div>
 </div>
