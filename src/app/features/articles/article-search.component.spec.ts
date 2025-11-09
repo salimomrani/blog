@@ -2,14 +2,26 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ArticleSearchComponent } from './article-search.component';
 import { CategoriesStore } from '../../store/categories.store';
 import { TagsStore } from '../../store/tags.store';
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CategoryDto } from '../../shared/models/category.model';
+import { TagDto } from '../../shared/models/tag.model';
 
 describe('ArticleSearchComponent', () => {
   let component: ArticleSearchComponent;
   let fixture: ComponentFixture<ArticleSearchComponent>;
-  let mockCategoriesStore: Partial<ReturnType<typeof CategoriesStore>>;
-  let mockTagsStore: Partial<ReturnType<typeof TagsStore>>;
+  let mockCategoriesStore: {
+    categories: WritableSignal<CategoryDto[]>;
+    isLoading: WritableSignal<boolean>;
+    error: WritableSignal<string | null>;
+    loadCategories: jest.Mock;
+  };
+  let mockTagsStore: {
+    tags: WritableSignal<TagDto[]>;
+    isLoading: WritableSignal<boolean>;
+    error: WritableSignal<string | null>;
+    loadTags: jest.Mock;
+  };
 
   beforeEach(async () => {
     mockCategoriesStore = {
@@ -160,7 +172,13 @@ describe('ArticleSearchComponent', () => {
   it('should compute isLoadingFilters from stores', () => {
     expect(component['isLoadingFilters']()).toBe(false);
 
-    mockCategoriesStore.isLoading = signal(true);
+    mockCategoriesStore.isLoading.set(true);
+    fixture.detectChanges();
+
+    expect(component['isLoadingFilters']()).toBe(true);
+
+    mockCategoriesStore.isLoading.set(false);
+    mockTagsStore.isLoading.set(true);
     fixture.detectChanges();
 
     expect(component['isLoadingFilters']()).toBe(true);
@@ -178,5 +196,47 @@ describe('ArticleSearchComponent', () => {
     fixture.detectChanges();
 
     expect(component['selectedTag']()?.name).toBe('Tag 2');
+  });
+
+  it('should trigger search when category is changed', () => {
+    const searchChangeSpy = jest.fn();
+    component.searchChange.subscribe(searchChangeSpy);
+
+    component['onCategoryChange']('1');
+
+    expect(component['selectedCategoryId']()).toBe(1);
+    expect(searchChangeSpy).toHaveBeenCalledWith({ categoryId: 1 });
+  });
+
+  it('should clear category when empty string is passed to onCategoryChange', () => {
+    const searchChangeSpy = jest.fn();
+    component.searchChange.subscribe(searchChangeSpy);
+
+    component['selectedCategoryId'].set(1);
+    component['onCategoryChange']('');
+
+    expect(component['selectedCategoryId']()).toBeUndefined();
+    expect(searchChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should trigger search when tag is changed', () => {
+    const searchChangeSpy = jest.fn();
+    component.searchChange.subscribe(searchChangeSpy);
+
+    component['onTagChange']('2');
+
+    expect(component['selectedTagId']()).toBe(2);
+    expect(searchChangeSpy).toHaveBeenCalledWith({ tagId: 2 });
+  });
+
+  it('should clear tag when empty string is passed to onTagChange', () => {
+    const searchChangeSpy = jest.fn();
+    component.searchChange.subscribe(searchChangeSpy);
+
+    component['selectedTagId'].set(2);
+    component['onTagChange']('');
+
+    expect(component['selectedTagId']()).toBeUndefined();
+    expect(searchChangeSpy).not.toHaveBeenCalled();
   });
 });
