@@ -2,10 +2,8 @@ import { ChangeDetectionStrategy, Component, OnInit, output, signal, inject, com
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ArticleSearchParams } from '../../services/articles.service';
-import { CategoriesService } from '../../services/categories.service';
-import { TagsService } from '../../services/tags.service';
-import { CategoryDto } from '../../shared/models/category.model';
-import { TagDto } from '../../shared/models/tag.model';
+import { CategoriesStore } from '../../store/categories.store';
+import { TagsStore } from '../../store/tags.store';
 
 @Component({
   selector: 'app-article-search',
@@ -19,23 +17,23 @@ export class ArticleSearchComponent implements OnInit {
   public readonly searchChange = output<ArticleSearchParams>();
   public readonly clearSearch = output<void>();
 
-  private readonly categoriesService = inject(CategoriesService);
-  private readonly tagsService = inject(TagsService);
+  protected readonly categoriesStore = inject(CategoriesStore);
+  protected readonly tagsStore = inject(TagsStore);
 
   protected readonly searchQuery = signal<string>('');
   protected readonly selectedCategoryId = signal<number | undefined>(undefined);
   protected readonly selectedTagId = signal<number | undefined>(undefined);
-  protected readonly categories = signal<CategoryDto[]>([]);
-  protected readonly tags = signal<TagDto[]>([]);
-  protected readonly isLoadingFilters = signal<boolean>(false);
 
-
-  readonly selectedCategory = computed(() =>
-    this.categories().find(c => c.id === this.selectedCategoryId())
+  protected readonly selectedCategory = computed(() =>
+    this.categoriesStore.categories().find(c => c.id === this.selectedCategoryId())
   );
 
-  readonly selectedTag = computed(() =>
-    this.tags().find(t => t.id === this.selectedTagId())
+  protected readonly selectedTag = computed(() =>
+    this.tagsStore.tags().find(t => t.id === this.selectedTagId())
+  );
+
+  protected readonly isLoadingFilters = computed(() =>
+    this.categoriesStore.isLoading() || this.tagsStore.isLoading()
   );
 
   public ngOnInit(): void {
@@ -43,31 +41,8 @@ export class ArticleSearchComponent implements OnInit {
   }
 
   private loadFilters(): void {
-    this.isLoadingFilters.set(true);
-
-    // Load categories
-    this.categoriesService.getAll().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.categories.set(response.data);
-        }
-      },
-      error: (error: unknown) => console.error('Failed to load categories:', error)
-    });
-
-    // Load tags
-    this.tagsService.getAll().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.tags.set(response.data);
-        }
-        this.isLoadingFilters.set(false);
-      },
-      error: (error: unknown) => {
-        console.error('Failed to load tags:', error);
-        this.isLoadingFilters.set(false);
-      }
-    });
+    this.categoriesStore.loadCategories();
+    this.tagsStore.loadTags();
   }
 
   protected onSearch(): void {

@@ -91,7 +91,7 @@
                    transition-all duration-200 ease-in-out"
           >
             <option value="">Toutes les catégories</option>
-            @for (category of categories(); track category.id) {
+            @for (category of categoriesStore.categories(); track category.id) {
               <option [value]="category.id">{{ category.name }}</option>
             }
           </select>
@@ -126,7 +126,7 @@
                    transition-all duration-200 ease-in-out"
           >
             <option value="">Tous les tags</option>
-            @for (tag of tags(); track tag.id) {
+            @for (tag of tagsStore.tags(); track tag.id) {
               <option [value]="tag.id">#{{ tag.name }}</option>
             }
           </select>

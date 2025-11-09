@@ -1,44 +1,42 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ArticleSearchComponent } from './article-search.component';
-import { CategoriesService } from '../../services/categories.service';
-import { TagsService } from '../../services/tags.service';
-import { of, throwError } from 'rxjs';
+import { CategoriesStore } from '../../store/categories.store';
+import { TagsStore } from '../../store/tags.store';
+import { signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 describe('ArticleSearchComponent', () => {
   let component: ArticleSearchComponent;
   let fixture: ComponentFixture<ArticleSearchComponent>;
-  let mockCategoriesService: Partial<CategoriesService>;
-  let mockTagsService: Partial<TagsService>;
+  let mockCategoriesStore: Partial<ReturnType<typeof CategoriesStore>>;
+  let mockTagsStore: Partial<ReturnType<typeof TagsStore>>;
 
   beforeEach(async () => {
-    mockCategoriesService = {
-      getAll: jest.fn().mockReturnValue(of({
-        success: true,
-        message: 'Success',
-        data: [
-          { id: 1, name: 'Category 1', slug: 'category-1', createdAt: '', updatedAt: '' },
-          { id: 2, name: 'Category 2', slug: 'category-2', createdAt: '', updatedAt: '' }
-        ]
-      }))
+    mockCategoriesStore = {
+      categories: signal([
+        { id: 1, name: 'Category 1', slug: 'category-1', createdAt: '', updatedAt: '' },
+        { id: 2, name: 'Category 2', slug: 'category-2', createdAt: '', updatedAt: '' }
+      ]),
+      isLoading: signal(false),
+      error: signal(null),
+      loadCategories: jest.fn()
     };
 
-    mockTagsService = {
-      getAll: jest.fn().mockReturnValue(of({
-        success: true,
-        message: 'Success',
-        data: [
-          { id: 1, name: 'Tag 1', slug: 'tag-1', createdAt: '', updatedAt: '' },
-          { id: 2, name: 'Tag 2', slug: 'tag-2', createdAt: '', updatedAt: '' }
-        ]
-      }))
+    mockTagsStore = {
+      tags: signal([
+        { id: 1, name: 'Tag 1', slug: 'tag-1', createdAt: '', updatedAt: '' },
+        { id: 2, name: 'Tag 2', slug: 'tag-2', createdAt: '', updatedAt: '' }
+      ]),
+      isLoading: signal(false),
+      error: signal(null),
+      loadTags: jest.fn()
     };
 
     await TestBed.configureTestingModule({
       imports: [ArticleSearchComponent, FormsModule],
       providers: [
-        { provide: CategoriesService, useValue: mockCategoriesService },
-        { provide: TagsService, useValue: mockTagsService }
+        { provide: CategoriesStore, useValue: mockCategoriesStore },
+        { provide: TagsStore, useValue: mockTagsStore }
       ]
     }).compileComponents();
 
@@ -52,10 +50,10 @@ describe('ArticleSearchComponent', () => {
 
   it('should load categories and tags on init', () => {
     fixture.detectChanges();
-    expect(mockCategoriesService.getAll).toHaveBeenCalled();
-    expect(mockTagsService.getAll).toHaveBeenCalled();
-    expect(component['categories']().length).toBe(2);
-    expect(component['tags']().length).toBe(2);
+    expect(mockCategoriesStore.loadCategories).toHaveBeenCalled();
+    expect(mockTagsStore.loadTags).toHaveBeenCalled();
+    expect(component['categoriesStore'].categories().length).toBe(2);
+    expect(component['tagsStore'].tags().length).toBe(2);
   });
 
   it('should emit searchChange with query when onSearch is called', () => {
@@ -159,34 +157,26 @@ describe('ArticleSearchComponent', () => {
     expect(component['hasActiveFilters']()).toBe(false);
   });
 
-  it('should handle error when loading categories fails', () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    mockCategoriesService.getAll = jest.fn().mockReturnValue(
-      throwError(() => new Error('Failed to load'))
-    );
+  it('should compute isLoadingFilters from stores', () => {
+    expect(component['isLoadingFilters']()).toBe(false);
 
+    mockCategoriesStore.isLoading = signal(true);
     fixture.detectChanges();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Failed to load categories:',
-      expect.any(Error)
-    );
-    consoleErrorSpy.mockRestore();
+    expect(component['isLoadingFilters']()).toBe(true);
   });
 
-  it('should handle error when loading tags fails', () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    mockTagsService.getAll = jest.fn().mockReturnValue(
-      throwError(() => new Error('Failed to load'))
-    );
-
+  it('should compute selectedCategory from categoriesStore', () => {
+    component['selectedCategoryId'].set(1);
     fixture.detectChanges();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Failed to load tags:',
-      expect.any(Error)
-    );
-    expect(component['isLoadingFilters']()).toBe(false);
-    consoleErrorSpy.mockRestore();
+    expect(component['selectedCategory']()?.name).toBe('Category 1');
+  });
+
+  it('should compute selectedTag from tagsStore', () => {
+    component['selectedTagId'].set(2);
+    fixture.detectChanges();
+
+    expect(component['selectedTag']()?.name).toBe('Tag 2');
   });
 });
