@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { ArticlesStore } from './articles.store';
 import { ArticlesService } from '../services/articles.service';
+import { LikesService } from '../services/likes.service';
 import { of, throwError } from 'rxjs';
 import { ArticleDto, CreateArticleRequest, UpdateArticleRequest } from '../models/article.model';
 
 describe('ArticlesStore', () => {
   let store: InstanceType<typeof ArticlesStore>;
   let mockArticlesService: jest.Mocked<ArticlesService>;
+  let mockLikesService: jest.Mocked<LikesService>;
 
   const mockArticle: ArticleDto = {
     id: 1,
@@ -20,7 +22,9 @@ describe('ArticlesStore', () => {
       fullName: 'John Doe'
     },
     createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
+    updatedAt: '2024-01-01',
+    likesCount: 0,
+    isLikedByCurrentUser: false
   };
 
   beforeEach(() => {
@@ -29,13 +33,20 @@ describe('ArticlesStore', () => {
       getById: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn()
+      delete: jest.fn(),
+      search: jest.fn()
     } as unknown as jest.Mocked<ArticlesService>;
+
+    mockLikesService = {
+      likeArticle: jest.fn(),
+      unlikeArticle: jest.fn()
+    } as unknown as jest.Mocked<LikesService>;
 
     TestBed.configureTestingModule({
       providers: [
         ArticlesStore,
-        { provide: ArticlesService, useValue: mockArticlesService }
+        { provide: ArticlesService, useValue: mockArticlesService },
+        { provide: LikesService, useValue: mockLikesService }
       ]
     });
 
@@ -369,6 +380,115 @@ describe('ArticlesStore', () => {
 
         expect(store.error()).toBeNull();
         done();
+      }, 0);
+    });
+  });
+
+  describe('toggleLike', () => {
+    it('should like an article when not already liked', (done) => {
+      // First load an article
+      const articleToLike = { ...mockArticle, likesCount: 5, isLikedByCurrentUser: false };
+
+      mockArticlesService.getAll.mockReturnValue(of({
+        success: true,
+        message: 'Articles retrieved',
+        data: [articleToLike]
+      }));
+
+      store.loadArticles();
+
+      setTimeout(() => {
+        mockLikesService.likeArticle.mockReturnValue(of(void 0));
+
+        store.toggleLike(1);
+
+        setTimeout(() => {
+          expect(mockLikesService.likeArticle).toHaveBeenCalledWith(1);
+          expect(store.articles()[0].likesCount).toBe(6);
+          expect(store.articles()[0].isLikedByCurrentUser).toBe(true);
+          done();
+        }, 0);
+      }, 0);
+    });
+
+    it('should unlike an article when already liked', (done) => {
+      // First load an article that is already liked
+      const likedArticle = { ...mockArticle, likesCount: 5, isLikedByCurrentUser: true };
+
+      mockArticlesService.getAll.mockReturnValue(of({
+        success: true,
+        message: 'Articles retrieved',
+        data: [likedArticle]
+      }));
+
+      store.loadArticles();
+
+      setTimeout(() => {
+        mockLikesService.unlikeArticle.mockReturnValue(of(void 0));
+
+        store.toggleLike(1);
+
+        setTimeout(() => {
+          expect(mockLikesService.unlikeArticle).toHaveBeenCalledWith(1);
+          expect(store.articles()[0].likesCount).toBe(4);
+          expect(store.articles()[0].isLikedByCurrentUser).toBe(false);
+          done();
+        }, 0);
+      }, 0);
+    });
+
+    it('should update selectedArticle when toggling like', (done) => {
+      // Load a selected article
+      const articleToLike = { ...mockArticle, likesCount: 3, isLikedByCurrentUser: false };
+
+      mockArticlesService.getById.mockReturnValue(of({
+        success: true,
+        message: 'Article found',
+        data: articleToLike
+      }));
+
+      store.loadArticleById(1);
+
+      setTimeout(() => {
+        mockLikesService.likeArticle.mockReturnValue(of(void 0));
+
+        store.toggleLike(1);
+
+        setTimeout(() => {
+          expect(store.selectedArticle()?.likesCount).toBe(4);
+          expect(store.selectedArticle()?.isLikedByCurrentUser).toBe(true);
+          done();
+        }, 0);
+      }, 0);
+    });
+
+    it('should handle error when toggling like fails', (done) => {
+      const articleToLike = { ...mockArticle, likesCount: 5, isLikedByCurrentUser: false };
+
+      mockArticlesService.getAll.mockReturnValue(of({
+        success: true,
+        message: 'Articles retrieved',
+        data: [articleToLike]
+      }));
+
+      store.loadArticles();
+
+      setTimeout(() => {
+        const errorResponse = {
+          error: { message: 'Like failed' }
+        };
+
+        mockLikesService.likeArticle.mockReturnValue(throwError(() => errorResponse));
+
+        store.toggleLike(1);
+
+        setTimeout(() => {
+          expect(store.error()).toBe('Like failed');
+          // Article should remain unchanged
+          expect(store.articles()[0].likesCount).toBe(5);
+          expect(store.articles()[0].isLikedByCurrentUser).toBe(false);
+          done();
+        }, 0);
       }, 0);
     });
   });

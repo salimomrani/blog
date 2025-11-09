@@ -22,6 +22,8 @@ export interface ArticleDto {
   tags?: TagDto[];
   createdAt: string;
   updatedAt: string;
+  likesCount: number;
+  isLikedByCurrentUser: boolean;
 }
 
 export interface CreateArticleRequest {

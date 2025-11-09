@@ -61,6 +61,15 @@
           />
         </div>
 
+        <!-- Like Section -->
+        <div class="py-6 border-b">
+          <app-article-like-button
+            [articleId]="article.id"
+            [likesCount]="article.likesCount"
+            [isLiked]="article.isLikedByCurrentUser"
+          />
+        </div>
+
         <!-- Actions (only visible to authenticated author) -->
         @if (authStore.isAuthenticated() && (article | isAuthor)) {
           <div class="flex gap-3 pt-6 border-t">

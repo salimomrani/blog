@@ -125,6 +125,15 @@
               />
             </div>
 
+            <!-- Like -->
+            <div class="mb-4">
+              <app-article-like-button
+                [articleId]="article.id"
+                [likesCount]="article.likesCount"
+                [isLiked]="article.isLikedByCurrentUser"
+              />
+            </div>
+
             <!-- Actions -->
             <div class="flex gap-2">
               <a
