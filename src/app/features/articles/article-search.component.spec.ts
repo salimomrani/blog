@@ -3,7 +3,6 @@ import { ArticleSearchComponent } from './article-search.component';
 import { CategoriesService } from '../../services/categories.service';
 import { TagsService } from '../../services/tags.service';
 import { of, throwError } from 'rxjs';
-import { signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 describe('ArticleSearchComponent', () => {
