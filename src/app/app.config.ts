@@ -11,7 +11,7 @@ import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
-import { unauthorizedInterceptor } from './interceptors/unauthorized.interceptor';
+import { tokenRefreshInterceptor } from './interceptors/token-refresh.interceptor';
 import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
 import { AuthStore } from './store/auth.store';
 import { noop } from 'rxjs';
@@ -33,7 +33,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, unauthorizedInterceptor, forbiddenInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, tokenRefreshInterceptor, forbiddenInterceptor])),
     provideStore(),
     provideEffects(),
     provideStoreDevtools({
