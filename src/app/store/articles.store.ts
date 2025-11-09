@@ -206,9 +206,10 @@ export const ArticlesStore = signalStore(
     toggleLike: rxMethod<number>(
       pipe(
         switchMap((articleId) => {
-          // Find the article in the list or use selectedArticle
+          // Read current state to determine the operation
           const currentArticles = store.articles();
-          const article = currentArticles.find(a => a.id === articleId) ?? store.selectedArticle();
+          const currentSelectedArticle = store.selectedArticle();
+          const article = currentArticles.find(a => a.id === articleId) ?? currentSelectedArticle;
 
           if (!article) {
             return EMPTY;
@@ -221,8 +222,12 @@ export const ArticlesStore = signalStore(
 
           return operation.pipe(
             tap(() => {
+              // Read fresh state to handle any concurrent updates
+              const latestArticles = store.articles();
+              const latestSelectedArticle = store.selectedArticle();
+
               // Update the article in the articles list
-              const updatedArticles = currentArticles.map(a => {
+              const updatedArticles = latestArticles.map(a => {
                 if (a.id === articleId) {
                   return {
                     ...a,
@@ -234,13 +239,13 @@ export const ArticlesStore = signalStore(
               });
 
               // Update selectedArticle if it's the same article
-              const updatedSelectedArticle = store.selectedArticle()?.id === articleId
+              const updatedSelectedArticle = latestSelectedArticle?.id === articleId
                 ? {
-                    ...store.selectedArticle()!,
-                    likesCount: isLiked ? store.selectedArticle()!.likesCount - 1 : store.selectedArticle()!.likesCount + 1,
+                    ...latestSelectedArticle,
+                    likesCount: isLiked ? latestSelectedArticle.likesCount - 1 : latestSelectedArticle.likesCount + 1,
                     isLikedByCurrentUser: !isLiked
                   }
-                : store.selectedArticle();
+                : latestSelectedArticle;
 
               patchState(store, {
                 articles: updatedArticles,
