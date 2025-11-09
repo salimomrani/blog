@@ -61,6 +61,6 @@ describe('ArticleDetailComponent', () => {
     mockStore.isLoading = signal(true);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.animate-spin')).toBeTruthy();
+    expect(compiled.querySelector('app-spinner')).toBeTruthy();
   });
 });
