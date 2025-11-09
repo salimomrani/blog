@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,8 +9,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './badge.component.scss'
 })
 export class BadgeComponent {
-  @Input() public text: string = '';
-  @Input() public variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' = 'primary';
-  @Input() public size: 'small' | 'medium' | 'large' = 'medium';
-  @Input() public rounded: boolean = false;
+  public readonly text = input('');
+  public readonly variant = input<'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info'>('primary');
+  public readonly size = input<'small' | 'medium' | 'large'>('medium');
+  public readonly rounded = input(false);
 }

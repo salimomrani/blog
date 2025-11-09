@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,11 +9,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './error-message.component.scss'
 })
 export class ErrorMessageComponent {
-  @Input() public message: string = 'An error occurred';
-  @Input() public title?: string;
-  @Input() public dismissible: boolean = true;
-  @Input() public type: 'error' | 'warning' | 'info' = 'error';
-  @Output() public dismissed = new EventEmitter<void>();
+  public readonly message = input('An error occurred');
+  public readonly title = input<string>();
+  public readonly dismissible = input(true);
+  public readonly type = input<'error' | 'warning' | 'info'>('error');
+  public readonly dismissed = output<void>();
 
   public onDismiss(): void {
     this.dismissed.emit();

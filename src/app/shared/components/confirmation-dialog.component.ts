@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, input, output, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,15 +9,14 @@ import { CommonModule } from '@angular/common';
   styleUrl: './confirmation-dialog.component.scss'
 })
 export class ConfirmationDialogComponent {
-  @Input() public title: string = 'Confirm Action';
-  @Input() public message: string = 'Are you sure you want to proceed?';
-  @Input() public confirmText: string = 'Confirm';
-  @Input() public cancelText: string = 'Cancel';
-  @Input() public confirmButtonType: 'primary' | 'danger' = 'primary';
-  @Input() public isOpen: boolean = false;
-  @Output() public confirmed = new EventEmitter<void>();
-  @Output() public cancelled = new EventEmitter<void>();
-  @Output() public isOpenChange = new EventEmitter<boolean>();
+  public readonly title = input('Confirm Action');
+  public readonly message = input('Are you sure you want to proceed?');
+  public readonly confirmText = input('Confirm');
+  public readonly cancelText = input('Cancel');
+  public readonly confirmButtonType = input<'primary' | 'danger'>('primary');
+  public readonly isOpen = model(false);
+  public readonly confirmed = output<void>();
+  public readonly cancelled = output<void>();
 
   public onConfirm(): void {
     this.confirmed.emit();
@@ -29,14 +28,16 @@ export class ConfirmationDialogComponent {
     this.close();
   }
 
-  public onBackdropClick(event: MouseEvent): void {
+  public onBackdropClick(event: MouseEvent | KeyboardEvent): void {
     if (event.target === event.currentTarget) {
+      if (event instanceof KeyboardEvent && event.key !== 'Escape') {
+        return;
+      }
       this.onCancel();
     }
   }
 
   private close(): void {
-    this.isOpen = false;
-    this.isOpenChange.emit(false);
+    this.isOpen.set(false);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './spinner.component.scss'
 })
 export class SpinnerComponent {
-  @Input() public size: 'small' | 'medium' | 'large' = 'medium';
-  @Input() public color: 'primary' | 'secondary' | 'white' = 'primary';
-  @Input() public message?: string;
+  public readonly size = input<'small' | 'medium' | 'large'>('medium');
+  public readonly color = input<'primary' | 'secondary' | 'white'>('primary');
+  public readonly message = input<string>();
 }
