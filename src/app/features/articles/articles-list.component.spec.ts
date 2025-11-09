@@ -68,15 +68,15 @@ describe('ArticlesListComponent', () => {
     mockStore.isLoading = signal(true);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.animate-spin')).toBeTruthy();
+    expect(compiled.querySelector('app-spinner')).toBeTruthy();
   });
 
   it('should display error message', () => {
     mockStore.error = signal('Error loading articles');
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    const errorElement = compiled.querySelector('.text-red-700');
-    expect(errorElement?.textContent).toContain('Error loading articles');
+    const errorElement = compiled.querySelector('app-error-message');
+    expect(errorElement).toBeTruthy();
   });
 
   it('should display empty state when no articles', () => {

@@ -49,7 +49,7 @@
   <!-- Comments List -->
   @if (!commentsStore.isLoading() && commentsStore.hasComments()) {
     <div class="space-y-4">
-      @for (comment of commentsStore.nestedComments(); track trackByComment) {
+      @for (comment of commentsStore.nestedComments(); track comment.id) {
         <ng-template #commentTemplate let-comment="comment">
           <div
             [id]="'comment-' + comment.id"
@@ -138,7 +138,7 @@
                   <button (click)="toggleShowReplies(comment.id)" class="text-blue-600 hover:underline text-sm">
                     Masquer les réponses
                   </button>
-                  @for (reply of comment.replies; track trackByComment) {
+                  @for (reply of comment.replies; track reply.id) {
                     <ng-container *ngTemplateOutlet="commentTemplate; context: { comment: reply }"></ng-container>
                   }
                 }
