@@ -114,7 +114,7 @@ export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
 /**
  * Helper function to add Authorization header to a request
  */
-function addTokenToRequest(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
+export function addTokenToRequest(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   return request.clone({
     setHeaders: {
       ['Authorization']: `Bearer ${token}`

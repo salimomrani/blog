@@ -11,10 +11,10 @@ import { provideMarkdown } from 'ngx-markdown';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
-import { tokenRefreshInterceptor } from './interceptors/token-refresh.interceptor';
 import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
 import { AuthStore } from './store/auth.store';
-import { noop } from 'rxjs';
+import { firstValueFrom, noop } from 'rxjs';
+import { tokenRefreshInterceptor } from './interceptors/token-refresh.interceptor';
 
 /**
  * Initialize authentication before app starts
@@ -22,10 +22,8 @@ import { noop } from 'rxjs';
  * This ensures all guards and services have correct auth state before navigation
  */
 export function initializeAuth() {
-  return () => {
-    const authStore = inject(AuthStore);
-    return authStore.loadUserProfile().toPromise().catch(() => noop);
-  };
+  return () =>
+     firstValueFrom(inject(AuthStore).loadUserProfile()).catch(() => noop);
 }
 
 export const appConfig: ApplicationConfig = {
@@ -33,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, tokenRefreshInterceptor, forbiddenInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, forbiddenInterceptor,tokenRefreshInterceptor])),
     provideStore(),
     provideEffects(),
     provideStoreDevtools({
