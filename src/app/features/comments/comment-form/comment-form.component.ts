@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, input, output, inject } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CommentsStore } from '../../store/comments.store';
-import { AuthStore } from '../../store/auth.store';
+import { CommentsStore } from '../../../store/comments.store';
+import { AuthStore } from '../../../store/auth.store';
 
 @Component({
   selector: 'app-comment-form',
@@ -50,4 +50,3 @@ export class CommentFormComponent {
     this.commentSubmitted.emit();
   }
 }
-

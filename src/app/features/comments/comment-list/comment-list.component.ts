@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CommentsStore } from '../../store/comments.store';
-import { AuthStore } from '../../store/auth.store';
-import { CommentFormComponent } from './comment-form.component';
-import { CommentDto } from '../../shared/models/comment.model';
-import { ConfirmationDialogComponent } from '../../shared/components';
+import { CommentsStore } from '../../../store/comments.store';
+import { AuthStore } from '../../../store/auth.store';
+import { CommentFormComponent } from '../comment-form/comment-form.component';
+import { CommentDto } from '../../../shared/models/comment.model';
+import { ConfirmationDialogComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-comment-list',

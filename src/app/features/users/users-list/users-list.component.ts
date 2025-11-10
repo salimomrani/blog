@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { UsersStore } from '../../store/users.store';
-import { AuthStore } from '../../store/auth.store';
-import { SpinnerComponent, ErrorMessageComponent, BadgeComponent } from '../../shared/components';
+import { UsersStore } from '../../../store/users.store';
+import { AuthStore } from '../../../store/auth.store';
+import { SpinnerComponent, ErrorMessageComponent, BadgeComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-users-list',
