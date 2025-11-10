@@ -26,15 +26,6 @@
             ℹ️ À propos
           </a>
         </li>
-        <li>
-          <a
-            routerLink="/contact"
-            routerLinkActive="text-primary font-semibold"
-            class="text-secondary hover:text-primary transition-colors"
-          >
-            ✉️ Contact
-          </a>
-        </li>
         @if (authStore.isAdmin()) {
           <li>
             <a
@@ -127,16 +118,6 @@
               (click)="closeMobileMenu()"
             >
               ℹ️ À propos
-            </a>
-          </li>
-          <li>
-            <a
-              routerLink="/contact"
-              routerLinkActive="text-primary font-semibold"
-              class="text-secondary hover:text-primary transition-colors block py-2"
-              (click)="closeMobileMenu()"
-            >
-              ✉️ Contact
             </a>
           </li>
           @if (authStore.isAdmin()) {

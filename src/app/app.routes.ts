@@ -37,10 +37,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/about/about.component').then(m => m.AboutComponent)
   },
   {
-    path: 'contact',
-    loadComponent: () => import('./features/contact/contact.component').then(m => m.ContactComponent)
-  },
-  {
     path: 'articles',
     children: [
       {
