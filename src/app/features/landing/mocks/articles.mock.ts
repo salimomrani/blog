@@ -16,6 +16,7 @@ export const MOCK_ARTICLES: Article[] = [
     },
     likes: 142,
     commentsCount: 23,
+    viewsCount: 1205,
     createdAt: '2025-01-15T10:30:00Z',
     updatedAt: '2025-01-15T10:30:00Z'
   },
@@ -34,6 +35,7 @@ export const MOCK_ARTICLES: Article[] = [
     },
     likes: 89,
     commentsCount: 15,
+    viewsCount: 980,
     createdAt: '2025-01-18T14:20:00Z',
     updatedAt: '2025-01-18T14:20:00Z'
   },
@@ -52,6 +54,7 @@ export const MOCK_ARTICLES: Article[] = [
     },
     likes: 201,
     commentsCount: 34,
+    viewsCount: 1785,
     createdAt: '2025-01-20T09:15:00Z',
     updatedAt: '2025-01-20T09:15:00Z'
   },
@@ -70,6 +73,7 @@ export const MOCK_ARTICLES: Article[] = [
     },
     likes: 167,
     commentsCount: 28,
+    viewsCount: 1320,
     createdAt: '2025-01-22T16:45:00Z',
     updatedAt: '2025-01-22T16:45:00Z'
   },
@@ -88,6 +92,7 @@ export const MOCK_ARTICLES: Article[] = [
     },
     likes: 124,
     commentsCount: 19,
+    viewsCount: 1104,
     createdAt: '2025-01-25T11:00:00Z',
     updatedAt: '2025-01-25T11:00:00Z'
   },
@@ -106,6 +111,7 @@ export const MOCK_ARTICLES: Article[] = [
     },
     likes: 95,
     commentsCount: 12,
+    viewsCount: 845,
     createdAt: '2025-01-28T13:30:00Z',
     updatedAt: '2025-01-28T13:30:00Z'
   }
