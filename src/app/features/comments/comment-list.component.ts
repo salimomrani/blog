@@ -4,7 +4,7 @@ import { CommentsStore } from '../../store/comments.store';
 import { AuthStore } from '../../store/auth.store';
 import { CommentFormComponent } from './comment-form.component';
 import { CommentDto } from '../../shared/models/comment.model';
-import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '../../shared/components';
 
 @Component({
   selector: 'app-comment-list',
@@ -81,4 +81,3 @@ export class CommentListComponent implements OnInit {
     return comment.id;
   }
 }
-

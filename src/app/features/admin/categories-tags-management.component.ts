@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CategoriesStore } from '../../store/categories.store';
 import { TagsStore } from '../../store/tags.store';
-import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog.component';
+import { ConfirmationDialogComponent } from '../../shared/components';
 
 @Component({
   selector: 'app-categories-tags-management',
