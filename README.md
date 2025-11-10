@@ -1,59 +1,118 @@
-# Blog
+# Angular Blog Project
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.8.
+This is a modern Angular application that implements a blog platform. It is built with TypeScript and utilizes the latest Angular features, including standalone components and NgRx Signal Store for state management. The UI is styled with Tailwind CSS.
 
-## Development server
+## Features
 
-To start a local development server, run:
+-   User authentication (login/register).
+-   Article management (create, read, update, delete).
+-   User profile management.
+-   Admin-only sections for user and category/tag management.
+
+## Technology Stack
+
+-   **Angular 20.3**: Frontend framework with standalone components and Angular Signals.
+-   **TypeScript 5.9**: Primary programming language.
+-   **NgRx Signal Store**: For reactive state management.
+-   **Tailwind CSS**: For styling the user interface.
+-   **Jest**: For unit testing.
+-   **Spring Boot**: Backend API (communicates with `http://localhost:8080/api`).
+
+## Getting Started
+
+Follow these instructions to set up and run the project locally.
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+-   Node.js (LTS version recommended)
+-   npm (comes with Node.js)
+-   Angular CLI (`npm install -g @angular/cli`)
+-   Docker and Docker Compose (for running the backend or if you prefer containerized development)
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd angular-blog
+    ```
+2.  **Install frontend dependencies:**
+    ```bash
+    npm install
+    ```
+
+### Running the Development Server
+
+To start the Angular development server:
 
 ```bash
-ng serve
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+This will run the application in development mode on `http://localhost:4200`. The application will automatically reload if you change any of the source files.
 
-## Code scaffolding
+### Building for Production
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+To build the application for production:
 
 ```bash
-ng generate component component-name
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The build artifacts will be stored in the `dist/` directory.
+
+### Running Unit Tests
+
+To execute the unit tests using Jest:
 
 ```bash
-ng generate --help
+npm test
 ```
 
-## Building
+For watch mode:
+```bash
+npm run test:watch
+```
 
-To build the project run:
+For coverage report:
+```bash
+npm run test:coverage
+```
+
+### Linting
+
+To run ESLint to check for code quality and style issues:
 
 ```bash
-ng build
+npm run lint
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+To automatically fix linting errors where possible:
 
 ```bash
-ng test
+npm run lint:fix
 ```
 
-## Running end-to-end tests
+## Docker Development
 
-For end-to-end (e2e) testing, run:
+If you prefer to run the frontend in a Docker container with live reload:
 
 ```bash
-ng e2e
+docker compose up --build
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+This will build and start the frontend container. The application will be accessible at `http://localhost:4200` and will automatically reload on source code changes.
 
-## Additional Resources
+To stop the containers:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```bash
+docker compose down
+```
+
+## Further Documentation
+
+-   `BEST_PRACTICES.md`: Universal best practices for development.
+-   `CLAUDE.md`: Specific guidance for Claude Code AI assistant.
+-   `GEMINI.md`: Specific guidance for Gemini AI assistant.
