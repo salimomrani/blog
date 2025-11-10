@@ -25,6 +25,7 @@ export interface ArticleDto {
   likesCount: number;
   likedByCurrentUser: boolean;
   viewsCount: number;
+  commentsCount: number;
 }
 
 export interface CreateArticleRequest {
