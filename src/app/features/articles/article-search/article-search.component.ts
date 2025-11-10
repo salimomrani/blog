@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, output, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ArticleSearchParams } from '../../services/articles.service';
-import { CategoriesStore } from '../../store/categories.store';
-import { TagsStore } from '../../store/tags.store';
+import { ArticleSearchParams } from '../../../services/articles.service';
+import { CategoriesStore } from '../../../store/categories.store';
+import { TagsStore } from '../../../store/tags.store';
 
 @Component({
   selector: 'app-article-search',

@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ArticleSearchComponent } from './article-search.component';
-import { CategoriesStore } from '../../store/categories.store';
-import { TagsStore } from '../../store/tags.store';
+import { CategoriesStore } from '../../../store/categories.store';
+import { TagsStore } from '../../../store/tags.store';
 import { signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CategoryDto } from '../../shared/models/category.model';
-import { TagDto } from '../../shared/models/tag.model';
+import { CategoryDto } from '../../../shared/models/category.model';
+import { TagDto } from '../../../shared/models/tag.model';
 
 describe('ArticleSearchComponent', () => {
   let component: ArticleSearchComponent;

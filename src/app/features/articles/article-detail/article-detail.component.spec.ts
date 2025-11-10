@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
 import { ArticleDetailComponent } from './article-detail.component';
-import { ArticlesStore } from '../../store/articles.store';
-import { AuthStore } from '../../store/auth.store';
+import { ArticlesStore } from '../../../store/articles.store';
+import { AuthStore } from '../../../store/auth.store';
 import { signal } from '@angular/core';
 
 describe('ArticleDetailComponent', () => {
