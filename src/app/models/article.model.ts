@@ -20,6 +20,7 @@ export interface ArticleDto {
   author: AuthorDto;
   categories?: CategoryDto[];
   tags?: TagDto[];
+  commentsCount?: number;
   createdAt: string;
   updatedAt: string;
   likesCount: number;
