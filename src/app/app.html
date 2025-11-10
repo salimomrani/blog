@@ -7,76 +7,85 @@
       </a>
 
       <!-- Desktop Menu -->
-      <ul class="hidden md:flex gap-6 items-center">
-        <li>
-          <a
-            routerLink="/articles"
-            routerLinkActive="text-primary font-semibold"
-            class="text-secondary hover:text-primary transition-colors"
-          >
-            📚 Articles
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/about"
-            routerLinkActive="text-primary font-semibold"
-            class="text-secondary hover:text-primary transition-colors"
-          >
-            ℹ️ À propos
-          </a>
-        </li>
-        @if (authStore.isAdmin()) {
+      <div class="hidden md:flex items-center gap-6">
+        <!-- Main Links -->
+        <ul class="flex gap-6 items-center">
           <li>
             <a
-              routerLink="/users"
+              routerLink="/articles"
               routerLinkActive="text-primary font-semibold"
               class="text-secondary hover:text-primary transition-colors"
             >
-              👥 Utilisateurs
+              📚 Articles
             </a>
           </li>
+          @if (authStore.isAdmin()) {
+            <li>
+              <a
+                routerLink="/admin/categories-tags"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                ⚙️ Catégories & Tags
+              </a>
+            </li>
+            <li>
+              <a
+                routerLink="/users"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                👥 Utilisateurs
+              </a>
+            </li>
+          }
           <li>
             <a
-              routerLink="/admin/categories-tags"
+              routerLink="/about"
               routerLinkActive="text-primary font-semibold"
               class="text-secondary hover:text-primary transition-colors"
             >
-              ⚙️ Catégories & Tags
+              ℹ️ À propos
             </a>
           </li>
-        }
-        @if (!authStore.isAuthenticated()) {
-          <li>
-            <a
-              routerLink="/auth/login"
-              routerLinkActive="text-primary font-semibold"
-              class="text-secondary hover:text-primary transition-colors"
-            >
-              🔐 Connexion
-            </a>
-          </li>
-        }
-        @if (authStore.isAuthenticated()) {
-          <li>
-            <a
-              routerLink="/profile"
-              routerLinkActive="text-primary font-semibold"
-              class="text-secondary hover:text-primary transition-colors"
-            >
-              👤 {{ authStore.fullName() || 'Profil' }}
-            </a>
-          </li>
-          <li>
-            <button
-              (click)="onLogout()"
-              class="text-secondary hover:text-red-600 transition-colors font-medium"
-            >
-              🚪 Déconnexion
-            </button>
-          </li>
-        }
-      </ul>
+        </ul>
+
+        <div class="border-l border-gray-300 h-6"></div>
+
+        <!-- User Links -->
+        <ul class="flex gap-6 items-center">
+          @if (!authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/auth/login"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                🔐 Connexion
+              </a>
+            </li>
+          }
+          @if (authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/profile"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                👤 {{ authStore.fullName() || 'Profil' }}
+              </a>
+            </li>
+            <li>
+              <button
+                (click)="onLogout()"
+                class="text-secondary hover:text-red-600 transition-colors font-medium"
+              >
+                🚪 Déconnexion
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
 
       <!-- Mobile Menu Button -->
       <button
@@ -110,27 +119,7 @@
               📚 Articles
             </a>
           </li>
-          <li>
-            <a
-              routerLink="/about"
-              routerLinkActive="text-primary font-semibold"
-              class="text-secondary hover:text-primary transition-colors block py-2"
-              (click)="closeMobileMenu()"
-            >
-              ℹ️ À propos
-            </a>
-          </li>
           @if (authStore.isAdmin()) {
-            <li>
-              <a
-                routerLink="/users"
-                routerLinkActive="text-primary font-semibold"
-                class="text-secondary hover:text-primary transition-colors block py-2"
-                (click)="closeMobileMenu()"
-              >
-                👥 Utilisateurs
-              </a>
-            </li>
             <li>
               <a
                 routerLink="/admin/categories-tags"
@@ -141,7 +130,27 @@
                 ⚙️ Catégories & Tags
               </a>
             </li>
+            <li>
+              <a
+                routerLink="/users"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors block py-2"
+                (click)="closeMobileMenu()"
+              >
+                👥 Utilisateurs
+              </a>
+            </li>
           }
+          <li>
+            <a
+              routerLink="/about"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors block py-2"
+              (click)="closeMobileMenu()"
+            >
+              ℹ️ À propos
+            </a>
+          </li>
           @if (!authStore.isAuthenticated()) {
             <li>
               <a
