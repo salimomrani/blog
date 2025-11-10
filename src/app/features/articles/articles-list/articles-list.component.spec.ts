@@ -86,4 +86,28 @@ describe('ArticlesListComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Aucun article');
   });
+
+  it('should display article stats', () => {
+    const mockArticle = {
+      id: 1,
+      title: 'Test Article',
+      content: 'Test content',
+      author: { id: 1, fullName: 'Test Author' },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      likesCount: 10,
+      likedByCurrentUser: false,
+      viewsCount: 100,
+      commentsCount: 5,
+    };
+    mockStore.articles = signal([mockArticle]);
+    mockStore.hasArticles = signal(true);
+    mockStore.isLoading = signal(false);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    const statsElement = compiled.querySelector('.flex.items-center.gap-4');
+    expect(statsElement).toBeTruthy();
+    expect(statsElement?.textContent).toContain('5'); // comments
+    expect(statsElement?.textContent).toContain('100'); // views
+  });
 });
