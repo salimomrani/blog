@@ -1,11 +1,10 @@
 import { Component, signal, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthStore } from './store/auth.store';
-import { FooterComponent } from './shared/components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, FooterComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
