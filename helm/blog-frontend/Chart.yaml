@@ -1,0 +1,13 @@
+apiVersion: v2
+name: blog-frontend
+description: A Helm chart for Blog Frontend Angular Application
+type: application
+version: 1.0.0
+appVersion: "0.0.0"
+keywords:
+  - angular
+  - blog
+  - frontend
+maintainers:
+  - name: Salim Omrani
+    email: salim@example.com
