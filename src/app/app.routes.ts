@@ -11,7 +11,7 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
+    loadComponent: () => import('./features/landing/landing/landing.component').then(m => m.LandingComponent)
   },
   {
     path: 'auth',
@@ -30,7 +30,7 @@ export const routes: Routes = [
   {
     path: 'profile',
     canActivate: [authGuard],
-    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
+    loadComponent: () => import('./features/profile/profile/profile.component').then(m => m.ProfileComponent)
   },
   {
     path: 'articles',
@@ -61,19 +61,19 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/users/users-list.component').then(m => m.UsersListComponent)
+        loadComponent: () => import('./features/users/users-list/users-list.component').then(m => m.UsersListComponent)
       },
       {
         path: 'new',
-        loadComponent: () => import('./features/users/user-form.component').then(m => m.UserFormComponent)
+        loadComponent: () => import('./features/users/user-form/user-form.component').then(m => m.UserFormComponent)
       },
       {
         path: ':id',
-        loadComponent: () => import('./features/users/user-detail.component').then(m => m.UserDetailComponent)
+        loadComponent: () => import('./features/users/user-detail/user-detail.component').then(m => m.UserDetailComponent)
       },
       {
         path: ':id/edit',
-        loadComponent: () => import('./features/users/user-form.component').then(m => m.UserFormComponent)
+        loadComponent: () => import('./features/users/user-form/user-form.component').then(m => m.UserFormComponent)
       }
     ]
   },
@@ -83,7 +83,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'categories-tags',
-        loadComponent: () => import('./features/admin/categories-tags-management.component').then(m => m.CategoriesTagsManagementComponent)
+        loadComponent: () => import('./features/admin/categories-tags-management/categories-tags-management.component').then(m => m.CategoriesTagsManagementComponent)
       }
     ]
   },

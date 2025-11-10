@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { UsersStore } from '../../store/users.store';
-import { AuthStore } from '../../store/auth.store';
-import { SpinnerComponent, BadgeComponent, ConfirmationDialogComponent } from '../../shared/components';
+import { UsersStore } from '../../../store/users.store';
+import { AuthStore } from '../../../store/auth.store';
+import { SpinnerComponent, BadgeComponent, ConfirmationDialogComponent } from '../../../shared/components';
 
 @Component({
   selector: 'app-user-detail',

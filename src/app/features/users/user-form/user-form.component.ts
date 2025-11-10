@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, effect, computed } 
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { UsersStore } from '../../store/users.store';
-import { AuthStore } from '../../store/auth.store';
+import { UsersStore } from '../../../store/users.store';
+import { AuthStore } from '../../../store/auth.store';
 
 @Component({
   selector: 'app-user-form',
