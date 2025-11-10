@@ -24,7 +24,8 @@ describe('ArticlesStore', () => {
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
     likesCount: 0,
-    likedByCurrentUser: false
+    likedByCurrentUser: false,
+    viewsCount: 0
   };
 
   beforeEach(() => {
@@ -34,7 +35,8 @@ describe('ArticlesStore', () => {
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      search: jest.fn()
+      search: jest.fn(),
+      incrementViews: jest.fn()
     } as unknown as jest.Mocked<ArticlesService>;
 
     mockLikesService = {
@@ -487,6 +489,63 @@ describe('ArticlesStore', () => {
           // Article should remain unchanged
           expect(store.articles()[0].likesCount).toBe(5);
           expect(store.articles()[0].likedByCurrentUser).toBe(false);
+          done();
+        }, 0);
+      }, 0);
+    });
+  });
+
+  describe('recordView', () => {
+    it('should update article views count in list when service succeeds', (done) => {
+      mockArticlesService.getAll.mockReturnValue(of({
+        success: true,
+        message: 'Articles retrieved',
+        data: [mockArticle]
+      }));
+
+      store.loadArticles();
+
+      setTimeout(() => {
+        const updatedArticle = { ...mockArticle, viewsCount: 5 };
+
+        mockArticlesService.incrementViews.mockReturnValue(of({
+          success: true,
+          message: 'View recorded',
+          data: updatedArticle
+        }));
+
+        store.recordView(1);
+
+        setTimeout(() => {
+          expect(mockArticlesService.incrementViews).toHaveBeenCalledWith(1);
+          expect(store.articles()[0].viewsCount).toBe(5);
+          done();
+        }, 0);
+      }, 0);
+    });
+
+    it('should update selected article views count when service succeeds', (done) => {
+      mockArticlesService.getById.mockReturnValue(of({
+        success: true,
+        message: 'Article found',
+        data: mockArticle
+      }));
+
+      store.loadArticleById(1);
+
+      setTimeout(() => {
+        const updatedArticle = { ...mockArticle, viewsCount: 3 };
+
+        mockArticlesService.incrementViews.mockReturnValue(of({
+          success: true,
+          message: 'View recorded',
+          data: updatedArticle
+        }));
+
+        store.recordView(1);
+
+        setTimeout(() => {
+          expect(store.selectedArticle()?.viewsCount).toBe(3);
           done();
         }, 0);
       }, 0);
