@@ -80,4 +80,11 @@ export class ArticlesService {
   public delete(id: number): Observable<{ success: boolean; message: string; data: unknown }> {
     return this.http.delete<{ success: boolean; message: string; data: unknown }>(`${this.baseUrl}/${id}`);
   }
+
+  /**
+   * Increment article view counter
+   */
+  public incrementViews(id: number): Observable<ApiResponseArticleDto> {
+    return this.http.post<ApiResponseArticleDto>(`${this.baseUrl}/${id}/views`, {});
+  }
 }

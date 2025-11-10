@@ -201,6 +201,34 @@ export const ArticlesStore = signalStore(
     ),
 
     /**
+     * Record a view for the given article
+     */
+    recordView: rxMethod<number>(
+      pipe(
+        switchMap((id) => articlesService.incrementViews(id).pipe(
+          tap((response) => {
+            if (!response.success) {
+              throw new Error(response.message);
+            }
+
+            const updatedArticle = response.data;
+            const updatedArticles = store.articles().map(article =>
+              article.id === updatedArticle.id ? updatedArticle : article
+            );
+
+            const selectedArticle = store.selectedArticle();
+
+            patchState(store, {
+              articles: updatedArticles,
+              selectedArticle: selectedArticle?.id === updatedArticle.id ? updatedArticle : selectedArticle
+            });
+          }),
+          catchError(() => EMPTY)
+        ))
+      )
+    ),
+
+    /**
      * Toggle like on an article
      */
     toggleLike: rxMethod<number>(

@@ -24,6 +24,7 @@ export interface ArticleDto {
   updatedAt: string;
   likesCount: number;
   likedByCurrentUser: boolean;
+  viewsCount: number;
 }
 
 export interface CreateArticleRequest {

@@ -18,7 +18,8 @@ describe('ArticleDetailComponent', () => {
       isLoading: signal(false),
       error: signal(null),
       loadArticleById: jest.fn(),
-      deleteArticle: jest.fn()
+      deleteArticle: jest.fn(),
+      recordView: jest.fn()
     };
 
     mockAuthStore = {
@@ -55,6 +56,7 @@ describe('ArticleDetailComponent', () => {
   it('should load article by id on init', () => {
     fixture.detectChanges();
     expect(mockStore.loadArticleById).toHaveBeenCalledWith(1);
+    expect(mockStore.recordView).toHaveBeenCalledWith(1);
   });
 
   it('should display loading state', () => {
