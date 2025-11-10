@@ -17,15 +17,6 @@
             📚 Articles
           </a>
         </li>
-        <li>
-          <a
-            routerLink="/about"
-            routerLinkActive="text-primary font-semibold"
-            class="text-secondary hover:text-primary transition-colors"
-          >
-            ℹ️ À propos
-          </a>
-        </li>
         @if (authStore.isAdmin()) {
           <li>
             <a
@@ -110,16 +101,6 @@
               📚 Articles
             </a>
           </li>
-          <li>
-            <a
-              routerLink="/about"
-              routerLinkActive="text-primary font-semibold"
-              class="text-secondary hover:text-primary transition-colors block py-2"
-              (click)="closeMobileMenu()"
-            >
-              ℹ️ À propos
-            </a>
-          </li>
           @if (authStore.isAdmin()) {
             <li>
               <a
@@ -183,3 +164,5 @@
 <main>
   <router-outlet />
 </main>
+
+<app-footer></app-footer>
