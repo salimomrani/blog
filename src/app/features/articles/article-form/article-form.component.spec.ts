@@ -4,9 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ArticleFormComponent } from './article-form.component';
-import { ArticlesStore } from '../../store/articles.store';
-import { CategoriesStore } from '../../store/categories.store';
-import { TagsStore } from '../../store/tags.store';
+import { ArticlesStore } from '../../../store/articles.store';
+import { CategoriesStore } from '../../../store/categories.store';
+import { TagsStore } from '../../../store/tags.store';
 import { signal } from '@angular/core';
 
 describe('ArticleFormComponent', () => {

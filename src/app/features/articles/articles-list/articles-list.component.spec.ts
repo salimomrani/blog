@@ -3,10 +3,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ArticlesListComponent } from './articles-list.component';
-import { ArticlesStore } from '../../store/articles.store';
-import { AuthStore } from '../../store/auth.store';
+import { ArticlesStore } from '../../../store/articles.store';
+import { AuthStore } from '../../../store/auth.store';
 import { signal } from '@angular/core';
-import { ArticleSearchParams } from '../../services/articles.service';
+import { ArticleSearchParams } from '../../../services/articles.service';
 
 describe('ArticlesListComponent', () => {
   let component: ArticlesListComponent;

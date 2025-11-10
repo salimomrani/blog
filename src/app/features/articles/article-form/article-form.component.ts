@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, effect } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ArticlesStore } from '../../store/articles.store';
-import { CategoriesStore } from '../../store/categories.store';
-import { TagsStore } from '../../store/tags.store';
+import { ArticlesStore } from '../../../store/articles.store';
+import { CategoriesStore } from '../../../store/categories.store';
+import { TagsStore } from '../../../store/tags.store';
 import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
