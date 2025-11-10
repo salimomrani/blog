@@ -11,6 +11,7 @@ export interface Article {
   author: UserPreview;
   likes: number;
   commentsCount: number;
+  viewsCount: number;
   createdAt: string;
   updatedAt: string;
 }

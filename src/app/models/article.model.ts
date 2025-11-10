@@ -2,8 +2,8 @@
  * Article models based on OpenAPI specification
  */
 
-import { CategoryDto } from '../shared/models/category.model';
-import { TagDto } from '../shared/models/tag.model';
+import { CategoryDto } from '../shared/models';
+import { TagDto } from '../shared/models';
 
 export interface AuthorDto {
   id: number;
@@ -24,6 +24,7 @@ export interface ArticleDto {
   updatedAt: string;
   likesCount: number;
   likedByCurrentUser: boolean;
+  viewsCount: number;
 }
 
 export interface CreateArticleRequest {
