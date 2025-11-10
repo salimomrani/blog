@@ -59,59 +59,6 @@ This Angular application communicates with a **Spring Boot** backend:
 - `/posts` - Blog posts management
 - `/users` - User management
 
-## Commands
-
-### Development
-```bash
-npm start               # Start dev server (http://localhost:4200)
-ng serve                # Alternative to npm start
-```
-
-### Build
-```bash
-npm run build           # Production build → dist/
-ng build                # Same as npm run build
-npm run watch           # Development build with watch mode
-```
-
-### Testing
-```bash
-npm test                # Run all tests with Jest
-npm run test:watch      # Run tests in watch mode
-npm run test:coverage   # Run tests with coverage report
-```
-
-### Linting
-```bash
-npm run lint            # Run ESLint on all files
-ng lint                 # Same as npm run lint
-npm run lint:fix        # Auto-fix ESLint errors where possible
-ng lint --fix           # Same as npm run lint:fix
-```
-
-### Docker Development
-```bash
-docker compose up --build         # Build and start containers with live reload
-docker compose up -d              # Start in detached mode
-docker compose down               # Stop and remove containers
-docker compose logs -f frontend   # Follow frontend logs
-docker compose restart frontend   # Restart frontend service
-```
-
-**Docker Live Reload Features:**
-- Automatically syncs source code changes (`src/`) to the container
-- Syncs configuration changes (angular.json, tsconfig files)
-- Angular dev server runs with polling for file change detection
-- Changes to source files trigger automatic reload in the browser
-- Accessible at http://localhost:4200
-- Uses volume mounting with `:delegated` for better performance on Mac/Windows
-
-### Code Generation
-```bash
-ng generate component component-name    # Generate new component
-ng generate --help                      # See all available schematics
-```
-
 ## Architecture
 
 ### Application Bootstrap
@@ -266,6 +213,61 @@ export const UsersStore = signalStore(
 - Routes defined in `src/app/app.routes.ts`
 - Uses functional router configuration via `provideRouter()`
 - Prefer lazy loading for feature routes using `loadComponent`
+
+## Commands
+
+### Development
+```bash
+npm start               # Start dev server (http://localhost:4200)
+ng serve                # Alternative to npm start
+```
+
+### Build
+```bash
+npm run build           # Production build → dist/
+ng build                # Same as npm run build
+npm run watch           # Development build with watch mode
+```
+
+### Testing
+```bash
+npm test                # Run all tests with Jest
+npm run test:watch      # Run tests in watch mode
+npm run test:coverage   # Run tests with coverage report
+```
+
+### Linting
+```bash
+npm run lint            # Run ESLint on all files
+ng lint                 # Same as npm run lint
+npm run lint:fix        # Auto-fix ESLint errors where possible
+ng lint --fix           # Same as npm run lint:fix
+
+- Note: The @angular-eslint/template/no-call-expression rule is intentionally relaxed for Angular Signals, as direct function calls in templates are often necessary for signal access. However, prefer computed signals or component getters for complex logic.
+```
+
+### Docker Development
+```bash
+docker compose up --build         # Build and start containers with live reload
+docker compose up -d              # Start in detached mode
+docker compose down               # Stop and remove containers
+docker compose logs -f frontend   # Follow frontend logs
+docker compose restart frontend   # Restart frontend service
+```
+
+**Docker Live Reload Features:**
+- Automatically syncs source code changes (`src/`) to the container
+- Syncs configuration changes (angular.json, tsconfig files)
+- Angular dev server runs with polling for file change detection
+- Changes to source files trigger automatic reload in the browser
+- Accessible at http://localhost:4200
+- Uses volume mounting with `:delegated` for better performance on Mac/Windows
+
+### Code Generation
+```bash
+ng generate component component-name    # Generate new component
+ng generate --help                      # See all available schematics
+```
 
 ## Code Organization
 
