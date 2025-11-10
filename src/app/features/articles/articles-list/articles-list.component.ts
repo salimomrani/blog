@@ -5,7 +5,7 @@ import { ArticlesStore } from '../../store/articles.store';
 import { AuthStore } from '../../store/auth.store';
 import { IsAuthorPipe } from '../../shared/pipes/is-author.pipe';
 import { TextExcerptPipe } from '../../shared/pipes/text-excerpt.pipe';
-import { ArticleSearchComponent } from './article-search.component';
+import { ArticleSearchComponent } from '../article-search/article-search.component';
 import { ArticleSearchParams } from '../../services/articles.service';
 import { ShareComponent, SpinnerComponent, ErrorMessageComponent, BadgeComponent } from '../../shared/components';
 import { ArticleLikeButtonComponent } from '../../shared/components/article-like-button/article-like-button.component';

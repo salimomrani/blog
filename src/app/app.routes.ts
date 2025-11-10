@@ -37,21 +37,21 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        loadComponent: () => import('./features/articles/articles-list.component').then(m => m.ArticlesListComponent)
+        loadComponent: () => import('./features/articles/articles-list/articles-list.component').then(m => m.ArticlesListComponent)
       },
       {
         path: 'new',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/articles/article-form.component').then(m => m.ArticleFormComponent)
+        loadComponent: () => import('./features/articles/article-form/article-form.component').then(m => m.ArticleFormComponent)
       },
       {
         path: ':id',
-        loadComponent: () => import('./features/articles/article-detail.component').then(m => m.ArticleDetailComponent)
+        loadComponent: () => import('./features/articles/article-detail/article-detail.component').then(m => m.ArticleDetailComponent)
       },
       {
         path: ':id/edit',
         canActivate: [authGuard],
-        loadComponent: () => import('./features/articles/article-form.component').then(m => m.ArticleFormComponent)
+        loadComponent: () => import('./features/articles/article-form/article-form.component').then(m => m.ArticleFormComponent)
       }
     ]
   },
