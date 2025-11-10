@@ -263,6 +263,35 @@ docker compose restart frontend   # Restart frontend service
 - Accessible at http://localhost:4200
 - Uses volume mounting with `:delegated` for better performance on Mac/Windows
 
+### Helm Deployment (Kubernetes)
+```bash
+# Deploy to different environments
+./scripts/deploy.sh dev                    # Deploy to development
+./scripts/deploy.sh staging -i v1.2.3      # Deploy to staging with specific tag
+./scripts/deploy.sh prod -n production     # Deploy to production namespace
+
+# Manual Helm commands
+helm upgrade --install blog-frontend ./helm/blog-frontend \
+  -f ./helm/blog-frontend/values-prod.yaml \
+  --namespace production \
+  --set image.tag=v1.2.3
+
+# Rollback
+helm rollback blog-frontend -n production
+
+# View deployment
+helm list -n production
+kubectl get pods -n production
+```
+
+**Helm Chart Features:**
+- Production-ready security (non-root, read-only filesystem)
+- Environment-specific configurations (dev, staging, prod)
+- Ingress with TLS support
+- HorizontalPodAutoscaler for auto-scaling
+- ConfigMap for nginx with backend API proxy
+- Complete documentation in `helm/blog-frontend/DEPLOYMENT.md`
+
 ### Code Generation
 ```bash
 ng generate component component-name    # Generate new component

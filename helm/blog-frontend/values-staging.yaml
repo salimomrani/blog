@@ -1,0 +1,38 @@
+# Staging environment configuration
+
+replicaCount: 2
+
+image:
+  repository: your-registry/blog-frontend
+  tag: "staging"
+  pullPolicy: Always
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  hosts:
+    - host: staging.blog.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: blog-frontend-staging-tls
+      hosts:
+        - staging.blog.example.com
+
+autoscaling:
+  enabled: false
+
+nginxConfig:
+  enabled: true
+  backendUrl: "https://staging-api.example.com"
