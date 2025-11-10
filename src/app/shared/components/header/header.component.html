@@ -1,0 +1,190 @@
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="container-custom py-4">
+    <div class="flex items-center justify-between">
+      <a routerLink="/home" class="no-underline text-2xl font-bold text-primary flex items-center gap-2">
+        <span class="text-3xl">🧪</span>
+        ThinkLab
+      </a>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center gap-6">
+        <!-- Main Links -->
+        <ul class="flex gap-6 items-center">
+          <li>
+            <a
+              routerLink="/articles"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors"
+            >
+              📚 Articles
+            </a>
+          </li>
+          @if (authStore.isAdmin()) {
+            <li>
+              <a
+                routerLink="/admin/categories-tags"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                ⚙️ Catégories & Tags
+              </a>
+            </li>
+            <li>
+              <a
+                routerLink="/users"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                👥 Utilisateurs
+              </a>
+            </li>
+          }
+          <li>
+            <a
+              routerLink="/about"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors"
+            >
+              ℹ️ À propos
+            </a>
+          </li>
+        </ul>
+
+        <div class="border-l border-gray-300 h-6"></div>
+
+        <!-- User Links -->
+        <ul class="flex gap-6 items-center">
+          @if (!authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/auth/login"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                🔐 Connexion
+              </a>
+            </li>
+          }
+          @if (authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/profile"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors"
+              >
+                👤 {{ authStore.fullName() || 'Profil' }}
+              </a>
+            </li>
+            <li>
+              <button
+                (click)="onLogout()"
+                class="text-secondary hover:text-red-600 transition-colors font-medium"
+              >
+                🚪 Déconnexion
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button
+        (click)="toggleMobileMenu()"
+        class="md:hidden text-secondary hover:text-primary transition-colors p-2"
+        aria-label="Toggle menu"
+      >
+        @if (!isMobileMenuOpen()) {
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        } @else {
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        }
+      </button>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    @if (isMobileMenuOpen()) {
+      <div class="md:hidden mt-4 pt-4 border-t border-gray-200">
+        <ul class="flex flex-col gap-4">
+          <li>
+            <a
+              routerLink="/articles"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors block py-2"
+              (click)="closeMobileMenu()"
+            >
+              📚 Articles
+            </a>
+          </li>
+          @if (authStore.isAdmin()) {
+            <li>
+              <a
+                routerLink="/admin/categories-tags"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors block py-2"
+                (click)="closeMobileMenu()"
+              >
+                ⚙️ Catégories & Tags
+              </a>
+            </li>
+            <li>
+              <a
+                routerLink="/users"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors block py-2"
+                (click)="closeMobileMenu()"
+              >
+                👥 Utilisateurs
+              </a>
+            </li>
+          }
+          <li>
+            <a
+              routerLink="/about"
+              routerLinkActive="text-primary font-semibold"
+              class="text-secondary hover:text-primary transition-colors block py-2"
+              (click)="closeMobileMenu()"
+            >
+              ℹ️ À propos
+            </a>
+          </li>
+          @if (!authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/auth/login"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors block py-2"
+                (click)="closeMobileMenu()"
+              >
+                🔐 Connexion
+              </a>
+            </li>
+          }
+          @if (authStore.isAuthenticated()) {
+            <li>
+              <a
+                routerLink="/profile"
+                routerLinkActive="text-primary font-semibold"
+                class="text-secondary hover:text-primary transition-colors block py-2"
+                (click)="closeMobileMenu()"
+              >
+                👤 {{ authStore.fullName() || 'Profil' }}
+              </a>
+            </li>
+            <li>
+              <button
+                (click)="onLogout()"
+                class="text-secondary hover:text-red-600 transition-colors font-medium text-left py-2 w-full"
+              >
+                🚪 Déconnexion
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</nav>
