@@ -89,7 +89,7 @@ module.exports = tseslint.config(
     rules: {
       // Template best practices
       "@angular-eslint/template/no-negated-async": "error",
-      "@angular-eslint/template/no-call-expression": "warn",
+      "@angular-eslint/template/no-call-expression": "off",
       "@angular-eslint/template/no-duplicate-attributes": "error",
       "@angular-eslint/template/conditional-complexity": ["warn", { maxComplexity: 5 }],
       "@angular-eslint/template/cyclomatic-complexity": ["warn", { maxComplexity: 10 }],

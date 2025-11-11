@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, patchState, withProps } from '@ngrx/signals';
+import { signalStore, withState, withComputed, withMethods, patchState, withProps, withHooks } from '@ngrx/signals';
 import { computed } from '@angular/core';
 import { AuthService, UserDto, RegisterRequestDto, ApiResponseAuthResponse, ApiResponseUserDto } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
@@ -15,21 +15,15 @@ export interface AuthState {
   error: string | null;
 }
 
-// Initialize state with tokens from localStorage
-function getInitialState(): AuthState {
-  const storageService = inject(StorageService);
-  return {
-    user: null,
-    accessToken: storageService.getAccessToken(),
-    refreshToken: storageService.getRefreshToken(),
-    isLoading: false,
-    error: null
-  };
-}
-
 export const AuthStore = signalStore(
   { providedIn: 'root' },
-  withState<AuthState>(getInitialState),
+  withState<AuthState>({
+    user: null,
+    accessToken: null,
+    refreshToken: null,
+    isLoading: false,
+    error: null
+  }),
   withProps(()=>({
     authService : inject(AuthService),
     storageService : inject(StorageService)
@@ -40,6 +34,11 @@ export const AuthStore = signalStore(
     fullName: computed(() => state.user()?.fullName ?? null),
     firstName: computed(() => state.user()?.firstName ?? null)
   })),
+  withHooks({
+    onInit({storageService,...store}) {
+      patchState(store, { accessToken: storageService.getAccessToken(), refreshToken: storageService.getRefreshToken() });
+    }
+  }),
   withMethods(( {authService, storageService, ...store} ) => ({
 
     login: rxMethod<{ email: string; password: string }>(
