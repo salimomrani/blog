@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth';
 
 @Component({
   selector: 'app-header',
@@ -12,9 +12,14 @@ import { AuthStore } from '../../../store/auth.store';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent implements OnInit {
-  protected readonly authStore = inject(AuthStore);
+  protected readonly authFacade = inject(AuthFacade);
   private readonly router = inject(Router);
   protected readonly isMobileMenuOpen = signal(false);
+
+  // Observables for template
+  protected readonly user$ = this.authFacade.user$;
+  protected readonly isAuthenticated$ = this.authFacade.isAuthenticated$;
+  protected readonly isAdmin$ = this.authFacade.isAdmin$;
 
   public ngOnInit(): void {
     // Close mobile menu on route change
@@ -32,11 +37,7 @@ export class HeaderComponent implements OnInit {
   }
 
   protected onLogout(): void {
-    this.authStore.logout().subscribe({
-      next: () => {
-        this.closeMobileMenu();
-        this.router.navigate(['/home']);
-      }
-    });
+    this.authFacade.logout();
+    this.closeMobileMenu();
   }
 }

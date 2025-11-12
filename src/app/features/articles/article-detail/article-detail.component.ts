@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../../store/articles.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { IsAuthorPipe } from '../../../shared/pipes/is-author.pipe';
 import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
 import { CommentListComponent } from '../../comments/comment-list/comment-list.component';
@@ -21,9 +22,13 @@ import { signal } from '@angular/core';
 })
 export class ArticleDetailComponent implements OnInit {
   readonly articlesStore = inject(ArticlesStore);
-  readonly authStore = inject(AuthStore);
+  readonly authFacade = inject(AuthFacade);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  // Signal version of auth state (converted from observable)
+  readonly user = toSignal(this.authFacade.user$, { initialValue: null });
+  readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   protected readonly showDeleteDialog = signal(false);
 

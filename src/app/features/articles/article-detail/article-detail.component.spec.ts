@@ -1,16 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
+import { provideMockStore } from '@ngrx/store/testing';
 import { ArticleDetailComponent } from './article-detail.component';
 import { ArticlesStore } from '../../../store/articles.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 
 describe('ArticleDetailComponent', () => {
   let component: ArticleDetailComponent;
   let fixture: ComponentFixture<ArticleDetailComponent>;
   let mockStore: Partial<ArticlesStore>;
-  let mockAuthStore: Partial<AuthStore>;
+  let mockAuthFacade: Partial<AuthFacade>;
 
   beforeEach(async () => {
     mockStore = {
@@ -22,16 +24,16 @@ describe('ArticleDetailComponent', () => {
       recordView: jest.fn()
     };
 
-    mockAuthStore = {
-      isAuthenticated: signal(false),
-      user: signal(null)
+    mockAuthFacade = {
+      isAuthenticated$: of(false),
+      user$: of(null)
     };
 
     await TestBed.configureTestingModule({
       imports: [ArticleDetailComponent, RouterTestingModule],
       providers: [
         { provide: ArticlesStore, useValue: mockStore },
-        { provide: AuthStore, useValue: mockAuthStore },
+        { provide: AuthFacade, useValue: mockAuthFacade },
         {
           provide: ActivatedRoute,
           useValue: {
@@ -41,7 +43,18 @@ describe('ArticleDetailComponent', () => {
               }
             }
           }
-        }
+        },
+        provideMockStore({
+          initialState: {
+            auth: {
+              user: null,
+              accessToken: null,
+              refreshToken: null,
+              isLoading: false,
+              error: null
+            }
+          }
+        })
       ]
     }).compileComponents();
 

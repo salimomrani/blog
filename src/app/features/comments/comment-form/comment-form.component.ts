@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CommentsStore } from '../../../store/comments.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 
 @Component({
   selector: 'app-comment-form',
@@ -21,7 +22,10 @@ export class CommentFormComponent {
 
   private readonly fb = inject(FormBuilder);
   readonly commentsStore = inject(CommentsStore);
-  readonly authStore = inject(AuthStore);
+  readonly authFacade = inject(AuthFacade);
+
+  // Signal version of auth state (converted from observable)
+  readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   readonly form = this.fb.nonNullable.group({
     content: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(500)]]

@@ -109,7 +109,7 @@
               >
                 Lire plus
               </a>
-              @if (authStore.isAuthenticated() && (article | isAuthor)) {
+              @if (isAuthenticated() && (article | isAuthor)) {
                 <a
                   [routerLink]="['/articles', article.id, 'edit']"
                   class="inline-flex items-center px-3 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-300 transition duration-150"

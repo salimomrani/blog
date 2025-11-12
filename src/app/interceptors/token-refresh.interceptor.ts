@@ -1,16 +1,18 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { catchError, switchMap, throwError, take } from 'rxjs';
-import { AuthStore } from '../store/auth.store';
+import { Store } from '@ngrx/store';
+import { catchError, switchMap, throwError, take, first } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { StorageService } from '../services/storage.service';
 import { TokenRefreshService } from '../services/token-refresh.service';
+import { selectRefreshToken } from '../store/auth';
+import * as authActions from '../store/auth/auth.actions';
 
 /**
  * Interceptor to handle token refresh on 401 Unauthorized responses
  *
- * Uses Angular Signals via TokenRefreshService to manage refresh state.
+ * Uses NgRx Store to manage refresh state.
  *
  * When a request fails with 401:
  * 1. Checks if refresh token exists
@@ -20,7 +22,7 @@ import { TokenRefreshService } from '../services/token-refresh.service';
  */
 export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
-  const authStore = inject(AuthStore);
+  const store = inject(Store);
   const authService = inject(AuthService);
   const storageService = inject(StorageService);
   const tokenRefreshService = inject(TokenRefreshService);
@@ -37,74 +39,80 @@ export const tokenRefreshInterceptor: HttpInterceptorFn = (req, next) => {
           req.url.includes('/auth/register') ||
           req.url.includes('/auth/refresh')) {
         // For auth endpoints, logout and redirect
-        authStore.logout();
+        store.dispatch(authActions.logout());
         router.navigate(['/auth/login'], {
           queryParams: { returnUrl: router.url }
         });
         return throwError(() => error);
       }
 
-      const refreshToken = authStore.refreshToken();
-
-      // If no refresh token, logout immediately
-      if (!refreshToken) {
-        authStore.logout();
-        router.navigate(['/auth/login'], {
-          queryParams: { returnUrl: router.url }
-        });
-        return throwError(() => error);
-      }
-
-      // If already refreshing, wait for the new token
-      if (tokenRefreshService.isCurrentlyRefreshing()) {
-        return tokenRefreshService.refreshedToken$.pipe(
-          take(1),
-          switchMap(token => {
-            // Retry the request with the new token
-            const clonedReq = addTokenToRequest(req, token);
-            return next(clonedReq);
-          })
-        );
-      }
-
-      // Mark as refreshing
-      tokenRefreshService.startRefreshing();
-
-      // Attempt to refresh the token
-      return authService.refresh(refreshToken).pipe(
-        switchMap((response) => {
-          if (!response.success) {
-            throw new Error(response.message);
+      return store.select(selectRefreshToken).pipe(
+        first(),
+        switchMap(refreshToken => {
+          // If no refresh token, logout immediately
+          if (!refreshToken) {
+            store.dispatch(authActions.logout());
+            router.navigate(['/auth/login'], {
+              queryParams: { returnUrl: router.url }
+            });
+            return throwError(() => error);
           }
 
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-          // Update tokens in storage and store
-          storageService.setAccessToken(accessToken);
-          if (newRefreshToken) {
-            storageService.setRefreshToken(newRefreshToken);
+          // If already refreshing, wait for the new token
+          if (tokenRefreshService.isCurrentlyRefreshing()) {
+            return tokenRefreshService.refreshedToken$.pipe(
+              take(1),
+              switchMap(token => {
+                // Retry the request with the new token
+                const clonedReq = addTokenToRequest(req, token);
+                return next(clonedReq);
+              })
+            );
           }
 
-          // Update auth store with new tokens
-          authStore.updateTokens(accessToken, newRefreshToken ?? refreshToken);
+          // Mark as refreshing
+          tokenRefreshService.startRefreshing();
 
-          // Mark refreshing as complete and emit new token
-          tokenRefreshService.completeRefresh(accessToken);
+          // Attempt to refresh the token
+          return authService.refresh(refreshToken).pipe(
+            switchMap((response) => {
+              if (!response.success) {
+                throw new Error(response.message);
+              }
 
-          // Retry the original request with the new token
-          const clonedReq = addTokenToRequest(req, accessToken);
-          return next(clonedReq);
-        }),
-        catchError((refreshError) => {
-          // Refresh failed, mark as failed and logout the user
-          tokenRefreshService.failRefresh();
+              const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-          authStore.logout();
-          router.navigate(['/auth/login'], {
-            queryParams: { returnUrl: router.url, expired: 'true' }
-          });
+              // Update tokens in storage
+              storageService.setAccessToken(accessToken);
+              if (newRefreshToken) {
+                storageService.setRefreshToken(newRefreshToken);
+              }
 
-          return throwError(() => refreshError);
+              // Update auth store with new tokens via action
+              store.dispatch(authActions.updateTokens({
+                accessToken,
+                refreshToken: newRefreshToken ?? refreshToken
+              }));
+
+              // Mark refreshing as complete and emit new token
+              tokenRefreshService.completeRefresh(accessToken);
+
+              // Retry the original request with the new token
+              const clonedReq = addTokenToRequest(req, accessToken);
+              return next(clonedReq);
+            }),
+            catchError((refreshError) => {
+              // Refresh failed, mark as failed and logout the user
+              tokenRefreshService.failRefresh();
+
+              store.dispatch(authActions.logout());
+              router.navigate(['/auth/login'], {
+                queryParams: { returnUrl: router.url, expired: 'true' }
+              });
+
+              return throwError(() => refreshError);
+            })
+          );
         })
       );
     })

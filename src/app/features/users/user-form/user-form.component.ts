@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersStore } from '../../../store/users.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 
 @Component({
   selector: 'app-user-form',
@@ -18,7 +19,10 @@ export class UserFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   readonly usersStore = inject(UsersStore);
-  readonly authStore = inject(AuthStore);
+  readonly authFacade = inject(AuthFacade);
+
+  // Signal version of auth state (converted from observable)
+  readonly currentUser = toSignal(this.authFacade.user$, { initialValue: null });
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -37,7 +41,7 @@ export class UserFormComponent implements OnInit {
    * Check if admin is editing their own profile
    */
   protected readonly isEditingSelf = computed(() => {
-    const currentUser = this.authStore.user();
+    const currentUser = this.currentUser();
     const selectedUser = this.usersStore.selectedUser();
     return currentUser && selectedUser && currentUser.id === selectedUser.id;
   });

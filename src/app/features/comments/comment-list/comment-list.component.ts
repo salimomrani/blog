@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommentsStore } from '../../../store/comments.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { CommentFormComponent } from '../comment-form/comment-form.component';
 import { CommentDto } from '../../../shared/models/comment.model';
 import { ConfirmationDialogComponent } from '../../../shared/components';
@@ -18,7 +19,11 @@ export class CommentListComponent implements OnInit {
   readonly articleId = input.required<number>();
 
   readonly commentsStore = inject(CommentsStore);
-  readonly authStore = inject(AuthStore);
+  readonly authFacade = inject(AuthFacade);
+
+  // Signal versions of auth state (converted from observables)
+  readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
+  readonly user = toSignal(this.authFacade.user$, { initialValue: null });
 
   readonly replyingTo = signal<number | null>(null);
   readonly showRepliesForCommentIds = signal(new Set<number>());
@@ -49,8 +54,7 @@ export class CommentListComponent implements OnInit {
   }
 
   public isCommentAuthor(authorId: number): boolean {
-    const currentUser = this.authStore.user();
-    return currentUser?.id === authorId;
+    return this.user()?.id === authorId;
   }
 
   public toggleReply(commentId: number): void {
@@ -87,7 +91,7 @@ export class CommentListComponent implements OnInit {
   }
 
   protected canDeleteComment(comment: CommentDto): boolean {
-    return this.authStore.isAuthenticated() && this.isCommentAuthor(comment.author.id);
+    return this.isAuthenticated() && this.isCommentAuthor(comment.author.id);
   }
 
   protected showEmptyState(): boolean {

@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 import { App } from './app';
 import { RouterOutlet } from '@angular/router';
 import { By } from '@angular/platform-browser';
@@ -19,7 +20,18 @@ describe('App', () => {
           { path: 'users', component: App }
         ]),
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        provideMockStore({
+          initialState: {
+            auth: {
+              user: null,
+              accessToken: null,
+              refreshToken: null,
+              isLoading: false,
+              error: null
+            }
+          }
+        })
       ]
     }).compileComponents();
 

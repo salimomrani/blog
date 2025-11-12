@@ -86,7 +86,7 @@
 
               <!-- Actions -->
               <div class="flex items-center space-x-2">
-                @if (authStore.isAuthenticated()) {
+                @if (isAuthenticated()) {
                   <button
                     (click)="toggleReply(comment.id)"
                     class="text-blue-600 hover:text-blue-800 transition duration-150 text-sm"

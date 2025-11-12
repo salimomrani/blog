@@ -1,7 +1,8 @@
 import { Component, input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ArticlesStore } from '../../../store/articles.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 
 /**
  * Component for displaying and managing article likes
@@ -17,7 +18,10 @@ import { AuthStore } from '../../../store/auth.store';
 })
 export class ArticleLikeButtonComponent {
   protected readonly store = inject(ArticlesStore);
-  protected readonly authStore = inject(AuthStore);
+  protected readonly authFacade = inject(AuthFacade);
+
+  // Signal version of auth state (converted from observable)
+  protected readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   /**
    * The ID of the article
@@ -39,7 +43,7 @@ export class ArticleLikeButtonComponent {
    * Only works for authenticated users
    */
   protected onToggleLike(): void {
-    if (this.authStore.isAuthenticated()) {
+    if (this.isAuthenticated()) {
       this.store.toggleLike(this.articleId());
     }
   }
