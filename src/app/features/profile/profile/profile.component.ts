@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { AuthStore } from '../../../store/auth.store';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 
 @Component({
   selector: 'app-profile',
@@ -10,7 +11,10 @@ import { AuthStore } from '../../../store/auth.store';
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent {
-  protected readonly authStore = inject(AuthStore);
+  protected readonly authFacade = inject(AuthFacade);
+
+  // Signal version of auth state (converted from observable)
+  protected readonly user = toSignal(this.authFacade.user$, { initialValue: null });
 
   protected getRoleBadgeClass(role: 'ADMIN' | 'USER' | 'MODERATOR'): string {
     const baseClasses = 'inline-flex items-center px-3 py-1 text-sm font-medium rounded-full';

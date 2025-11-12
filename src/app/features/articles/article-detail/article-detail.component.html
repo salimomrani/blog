@@ -76,7 +76,7 @@
         </div>
 
         <!-- Actions (only visible to authenticated author) -->
-        @if (authStore.isAuthenticated() && (article | isAuthor)) {
+        @if (isAuthenticated() && (article | isAuthor)) {
           <div class="flex gap-3 pt-6 border-t">
             <a
               [routerLink]="['/articles', article.id, 'edit']"

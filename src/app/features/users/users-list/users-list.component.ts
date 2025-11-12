@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { UsersStore } from '../../../store/users.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { SpinnerComponent, ErrorMessageComponent, BadgeComponent } from '../../../shared/components';
 
 @Component({
@@ -16,7 +17,10 @@ import { SpinnerComponent, ErrorMessageComponent, BadgeComponent } from '../../.
 })
 export class UsersListComponent implements OnInit {
   readonly usersStore = inject(UsersStore);
-  readonly authStore = inject(AuthStore);
+  readonly authFacade = inject(AuthFacade);
+
+  // Signal version of auth state (converted from observable)
+  readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   public ngOnInit(): void {
     this.usersStore.loadUsers();

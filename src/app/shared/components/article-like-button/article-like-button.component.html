@@ -2,16 +2,16 @@
   type="button"
   class="like-button"
   [class.liked]="isLiked()"
-  [disabled]="!authStore.isAuthenticated()"
+  [disabled]="!isAuthenticated()"
   (click)="onToggleLike()"
   [attr.aria-label]="
-    !authStore.isAuthenticated()
+    !isAuthenticated()
       ? 'Login required to like articles'
       : isLiked()
         ? 'Unlike this article'
         : 'Like this article'
   "
-  [title]="!authStore.isAuthenticated() ? 'Login to like this article' : ''"
+  [title]="!isAuthenticated() ? 'Login to like this article' : ''"
 >
   <svg
     class="heart-icon"

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../../store/articles.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { IsAuthorPipe } from '../../../shared/pipes/is-author.pipe';
 import { TextExcerptPipe } from '../../../shared/pipes/text-excerpt.pipe';
 import { ArticleSearchComponent } from '../article-search/article-search.component';
@@ -21,11 +22,14 @@ import { ArticleDto } from '../../../models/article.model';
 })
 export class ArticlesListComponent implements OnInit {
   protected readonly articlesStore = inject(ArticlesStore);
-  protected readonly authStore = inject(AuthStore);
+  protected readonly authFacade = inject(AuthFacade);
+
+  // Signal version of auth state (converted from observable)
+  protected readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   // Computed signals for complex conditions
   protected readonly showNewArticleButton = computed(() =>
-    this.authStore.isAuthenticated() && this.articlesStore.hasArticles()
+    this.isAuthenticated() && this.articlesStore.hasArticles()
   );
 
   protected readonly showEmptyState = computed(() =>
@@ -37,17 +41,17 @@ export class ArticlesListComponent implements OnInit {
   );
 
   protected readonly emptyStateMessage = computed(() =>
-    this.authStore.isAuthenticated()
+    this.isAuthenticated()
       ? 'Commencez par créer votre premier article !'
       : 'Connectez-vous pour créer des articles'
   );
 
   protected readonly emptyStateButtonText = computed(() =>
-    this.authStore.isAuthenticated() ? 'Créer un Article' : 'Se connecter'
+    this.isAuthenticated() ? 'Créer un Article' : 'Se connecter'
   );
 
   protected readonly emptyStateButtonLink = computed(() =>
-    this.authStore.isAuthenticated() ? '/articles/new' : '/auth/login'
+    this.isAuthenticated() ? '/articles/new' : '/auth/login'
   );
 
   public ngOnInit(): void {

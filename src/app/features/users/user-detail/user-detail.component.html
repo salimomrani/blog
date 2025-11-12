@@ -58,7 +58,7 @@
         </div>
 
         <!-- Actions -->
-        @if (authStore.isAuthenticated()) {
+        @if (isAuthenticated()) {
           <div class="flex gap-3 pt-6 border-t">
             <a
               [routerLink]="['/users', user.id, 'edit']"

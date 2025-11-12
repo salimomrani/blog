@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { UsersStore } from '../../../store/users.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { SpinnerComponent, BadgeComponent, ConfirmationDialogComponent } from '../../../shared/components';
 
 @Component({
@@ -15,9 +16,13 @@ import { SpinnerComponent, BadgeComponent, ConfirmationDialogComponent } from '.
 })
 export class UserDetailComponent implements OnInit {
   readonly usersStore = inject(UsersStore);
-  readonly authStore = inject(AuthStore);
+  readonly authFacade = inject(AuthFacade);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  // Signal versions of auth state (converted from observables)
+  readonly currentUser = toSignal(this.authFacade.user$, { initialValue: null });
+  readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   protected readonly showDeleteDialog = signal(false);
 
@@ -25,7 +30,7 @@ export class UserDetailComponent implements OnInit {
    * Check if admin is viewing their own profile
    */
   protected readonly isViewingSelf = computed(() => {
-    const currentUser = this.authStore.user();
+    const currentUser = this.currentUser();
     const selectedUser = this.usersStore.selectedUser();
     return currentUser && selectedUser && currentUser.id === selectedUser.id;
   });

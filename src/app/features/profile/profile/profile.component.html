@@ -3,7 +3,7 @@
     <div class="bg-white rounded-lg shadow-md p-8">
       <h1 class="text-3xl font-bold text-gray-900 mb-6">Mon Profil</h1>
 
-      @if (authStore.user()) {
+      @if (user()) {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Informations personnelles -->
           <div class="space-y-4">
@@ -11,23 +11,23 @@
 
             <div>
               <p class="text-sm font-medium text-gray-500">Prénom</p>
-              <p class="text-lg text-gray-900">{{ authStore.user()?.firstName }}</p>
+              <p class="text-lg text-gray-900">{{ user()?.firstName }}</p>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Nom</p>
-              <p class="text-lg text-gray-900">{{ authStore.user()?.lastName }}</p>
+              <p class="text-lg text-gray-900">{{ user()?.lastName }}</p>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Nom complet</p>
-              <p class="text-lg text-gray-900 font-semibold">{{ authStore.user()?.fullName }}</p>
+              <p class="text-lg text-gray-900 font-semibold">{{ user()?.fullName }}</p>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Email</p>
-              <p class="text-lg text-gray-900">{{ authStore.user()?.email }}</p>
-              @if (authStore.user()?.emailVerified) {
+              <p class="text-lg text-gray-900">{{ user()?.email }}</p>
+              @if (user()?.emailVerified) {
                 <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full mt-1">
                   ✓ Vérifié
                 </span>
@@ -38,10 +38,10 @@
               }
             </div>
 
-            @if (authStore.user()?.phone) {
+            @if (user()?.phone) {
               <div>
                 <p class="text-sm font-medium text-gray-500">Téléphone</p>
-                <p class="text-lg text-gray-900">{{ authStore.user()?.phone }}</p>
+                <p class="text-lg text-gray-900">{{ user()?.phone }}</p>
               </div>
             }
           </div>
@@ -52,19 +52,19 @@
 
             <div>
               <p class="text-sm font-medium text-gray-500">ID Utilisateur</p>
-              <p class="text-sm text-gray-900 font-mono">{{ authStore.user()?.id }}</p>
+              <p class="text-sm text-gray-900 font-mono">{{ user()?.id }}</p>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Rôle</p>
-              <span [class]="getRoleBadgeClass(authStore.user()?.role || 'USER')">
-                {{ authStore.user()?.role }}
+              <span [class]="getRoleBadgeClass(user()?.role || 'USER')">
+                {{ user()?.role }}
               </span>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Statut du compte</p>
-              @if (authStore.user()?.active) {
+              @if (user()?.active) {
                 <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
                   ● Actif
                 </span>
@@ -75,26 +75,26 @@
               }
             </div>
 
-            @if (authStore.user()?.lastLogin) {
+            @if (user()?.lastLogin) {
               <div>
                 <p class="text-sm font-medium text-gray-500">Dernière connexion</p>
-                <p class="text-sm text-gray-900">{{ authStore.user()?.lastLogin | date:'medium' }}</p>
+                <p class="text-sm text-gray-900">{{ user()?.lastLogin | date:'medium' }}</p>
               </div>
             }
 
             <div>
               <p class="text-sm font-medium text-gray-500">Compte créé le</p>
-              <p class="text-sm text-gray-900">{{ authStore.user()?.createdAt | date:'medium' }}</p>
+              <p class="text-sm text-gray-900">{{ user()?.createdAt | date:'medium' }}</p>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Dernière mise à jour</p>
-              <p class="text-sm text-gray-900">{{ authStore.user()?.updatedAt | date:'medium' }}</p>
+              <p class="text-sm text-gray-900">{{ user()?.updatedAt | date:'medium' }}</p>
             </div>
 
             <div>
               <p class="text-sm font-medium text-gray-500">Version</p>
-              <p class="text-sm text-gray-900 font-mono">v{{ authStore.user()?.version }}</p>
+              <p class="text-sm text-gray-900 font-mono">v{{ user()?.version }}</p>
             </div>
           </div>
         </div>

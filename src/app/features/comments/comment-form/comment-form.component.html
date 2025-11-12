@@ -1,5 +1,5 @@
 <!-- Comment Form (only for authenticated users) -->
-@if (authStore.isAuthenticated()) {
+@if (isAuthenticated()) {
   <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
     <h4 class="text-lg font-semibold text-gray-900 mb-4">
       {{ parentId() ? 'Répondre au commentaire' : 'Ajouter un commentaire' }}
