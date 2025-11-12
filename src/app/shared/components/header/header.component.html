@@ -54,7 +54,7 @@
 
         <!-- User Links -->
         <ul class="flex gap-6 items-center">
-          @if (!(isAuthenticated$ | async)) {
+          @if ((isAuthenticated$ | async) === false) {
             <li>
               <a
                 routerLink="/auth/login"
@@ -151,7 +151,7 @@
               ℹ️ À propos
             </a>
           </li>
-          @if (!(isAuthenticated$ | async)) {
+          @if ((isAuthenticated$ | async) === false) {
             <li>
               <a
                 routerLink="/auth/login"

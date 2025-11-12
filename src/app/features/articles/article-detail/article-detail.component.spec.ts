@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
+import { provideMockStore } from '@ngrx/store/testing';
 import { ArticleDetailComponent } from './article-detail.component';
 import { ArticlesStore } from '../../../store/articles.store';
 import { AuthFacade } from '../../../store/auth/auth.facade';
@@ -42,7 +43,18 @@ describe('ArticleDetailComponent', () => {
               }
             }
           }
-        }
+        },
+        provideMockStore({
+          initialState: {
+            auth: {
+              user: null,
+              accessToken: null,
+              refreshToken: null,
+              isLoading: false,
+              error: null
+            }
+          }
+        })
       ]
     }).compileComponents();
 

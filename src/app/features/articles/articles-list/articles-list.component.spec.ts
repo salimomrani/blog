@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 import { ArticlesListComponent } from './articles-list.component';
 import { ArticlesStore } from '../../../store/articles.store';
 import { AuthFacade } from '../../../store/auth/auth.facade';
@@ -37,7 +38,18 @@ describe('ArticlesListComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: ArticlesStore, useValue: mockStore },
-        { provide: AuthFacade, useValue: mockAuthFacade }
+        { provide: AuthFacade, useValue: mockAuthFacade },
+        provideMockStore({
+          initialState: {
+            auth: {
+              user: null,
+              accessToken: null,
+              refreshToken: null,
+              isLoading: false,
+              error: null
+            }
+          }
+        })
       ]
     }).compileComponents();
 
