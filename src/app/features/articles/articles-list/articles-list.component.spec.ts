@@ -4,15 +4,16 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ArticlesListComponent } from './articles-list.component';
 import { ArticlesStore } from '../../../store/articles.store';
-import { AuthStore } from '../../../store/auth.store';
+import { AuthFacade } from '../../../store/auth/auth.facade';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { ArticleSearchParams } from '../../../services/articles.service';
 
 describe('ArticlesListComponent', () => {
   let component: ArticlesListComponent;
   let fixture: ComponentFixture<ArticlesListComponent>;
   let mockStore: Partial<ArticlesStore>;
-  let mockAuthStore: Partial<AuthStore>;
+  let mockAuthFacade: Partial<AuthFacade>;
 
   beforeEach(async () => {
     mockStore = {
@@ -25,9 +26,9 @@ describe('ArticlesListComponent', () => {
       searchArticles: jest.fn()
     };
 
-    mockAuthStore = {
-      isAuthenticated: signal(false),
-      user: signal(null)
+    mockAuthFacade = {
+      isAuthenticated$: of(false),
+      user$: of(null)
     };
 
     await TestBed.configureTestingModule({
@@ -36,7 +37,7 @@ describe('ArticlesListComponent', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: ArticlesStore, useValue: mockStore },
-        { provide: AuthStore, useValue: mockAuthStore }
+        { provide: AuthFacade, useValue: mockAuthFacade }
       ]
     }).compileComponents();
 
