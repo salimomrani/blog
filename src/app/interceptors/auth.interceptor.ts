@@ -1,17 +1,20 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
-import { AuthStore } from '../store/auth.store';
+import { Store } from '@ngrx/store';
+import { first, switchMap } from 'rxjs/operators';
+import { selectAccessToken } from '../store/auth';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authStore = inject(AuthStore);
-  const token = authStore.accessToken();
+  const store = inject(Store);
 
-  if (token) {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
-  }
-
-  return next(req);
+  return store.select(selectAccessToken).pipe(
+    first(),
+    switchMap(token => {
+      if (token) {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        req = req.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
+      }
+      return next(req);
+    })
+  );
 };
-
-

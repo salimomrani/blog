@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { AuthStore } from '../../../store/auth.store';
+import { RouterLink } from '@angular/router';
+import { AuthFacade } from '../../../store/auth';
 
 /**
  * Custom validator to check if password and confirmPassword match
@@ -27,8 +27,11 @@ function passwordMatchValidator(control: AbstractControl): ValidationErrors | nu
 })
 export class RegisterComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly router = inject(Router);
-  readonly authStore = inject(AuthStore);
+  protected readonly authFacade = inject(AuthFacade);
+
+  // Observables for template
+  protected readonly isLoading$ = this.authFacade.isLoading$;
+  protected readonly error$ = this.authFacade.error$;
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -38,13 +41,6 @@ export class RegisterComponent {
     confirmPassword: ['', [Validators.required]],
     phone: ['']
   }, { validators: passwordMatchValidator });
-
-  // Navigate to home only when authenticated
-  readonly redirectOnAuth = effect(() => {
-    if (this.authStore.isAuthenticated()) {
-      this.router.navigateByUrl('/home');
-    }
-  });
 
   // Helper methods for CSS classes
   protected getInputClass(controlName: 'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword'): string {
@@ -107,7 +103,7 @@ export class RegisterComponent {
     }
 
     const { firstName, lastName, email, password, phone } = this.form.getRawValue();
-    this.authStore.register({
+    this.authFacade.register({
       firstName,
       lastName,
       email,

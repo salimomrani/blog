@@ -8,22 +8,26 @@ import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideMarkdown } from 'ngx-markdown';
+import { Store } from '@ngrx/store';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
-import { AuthStore } from './store/auth.store';
-import { firstValueFrom, noop } from 'rxjs';
 import { tokenRefreshInterceptor } from './interceptors/token-refresh.interceptor';
+import { authReducer } from './store/auth';
+import { AuthEffects } from './store/auth';
+import * as authActions from './store/auth/auth.actions';
 
 /**
  * Initialize authentication before app starts
- * Actively calls /me API to load user profile on page refresh
- * This ensures all guards and services have correct auth state before navigation
+ * Loads tokens from storage and dispatches loadUserProfile if token exists
  */
 export function initializeAuth() {
-  return () =>
-     firstValueFrom(inject(AuthStore).loadUserProfile()).catch(() => noop);
+  return () => {
+    const store = inject(Store);
+    store.dispatch(authActions.initializeAuth());
+    store.dispatch(authActions.loadUserProfile());
+  };
 }
 
 export const appConfig: ApplicationConfig = {
@@ -31,9 +35,11 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, forbiddenInterceptor,tokenRefreshInterceptor])),
-    provideStore(),
-    provideEffects(),
+    provideHttpClient(withInterceptors([authInterceptor, forbiddenInterceptor, tokenRefreshInterceptor])),
+    provideStore({
+      auth: authReducer
+    }),
+    provideEffects([AuthEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),
@@ -43,6 +49,5 @@ export const appConfig: ApplicationConfig = {
     }),
     provideMarkdown(),
     provideAppInitializer(initializeAuth()),
-
   ]
 };
