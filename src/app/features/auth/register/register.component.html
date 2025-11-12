@@ -44,21 +44,15 @@
                 id="firstName"
                 formControlName="firstName"
                 placeholder="Votre prénom"
-                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150"
-                [class.border-red-500]="form.controls.firstName.touched && form.controls.firstName.invalid"
+                [class]="getInputClass('firstName')"
               />
             </div>
-            @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+            @if (getFirstNameError()) {
               <p class="mt-2 text-sm text-red-600 flex items-center">
                 <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                @if (form.controls.firstName.errors?.['required']) {
-                  Le prénom est requis
-                }
-                @if (form.controls.firstName.errors?.['minlength']) {
-                  Min. 2 caractères
-                }
+                {{ getFirstNameError() }}
               </p>
             }
           </div>
@@ -79,21 +73,15 @@
                 id="lastName"
                 formControlName="lastName"
                 placeholder="Votre nom"
-                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150"
-                [class.border-red-500]="form.controls.lastName.touched && form.controls.lastName.invalid"
+                [class]="getInputClass('lastName')"
               />
             </div>
-            @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+            @if (getLastNameError()) {
               <p class="mt-2 text-sm text-red-600 flex items-center">
                 <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                @if (form.controls.lastName.errors?.['required']) {
-                  Le nom est requis
-                }
-                @if (form.controls.lastName.errors?.['minlength']) {
-                  Min. 2 caractères
-                }
+                {{ getLastNameError() }}
               </p>
             }
           </div>
@@ -198,24 +186,15 @@
                 id="confirmPassword"
                 formControlName="confirmPassword"
                 placeholder="Confirmez"
-                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150"
-                [class.border-red-500]="(form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid) || form.errors?.['passwordMismatch']"
+                [class]="getInputClass('confirmPassword')"
               />
             </div>
-            @if (form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid) {
+            @if (getConfirmPasswordError()) {
               <p class="mt-2 text-sm text-red-600 flex items-center">
                 <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                Confirmation requise
-              </p>
-            }
-            @if (form.touched && form.errors?.['passwordMismatch'] && !form.controls.confirmPassword.invalid) {
-              <p class="mt-2 text-sm text-red-600 flex items-center">
-                <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                </svg>
-                Les mots de passe ne correspondent pas
+                {{ getConfirmPasswordError() }}
               </p>
             }
           </div>

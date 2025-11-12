@@ -23,18 +23,10 @@
                 id="categoryName"
                 formControlName="name"
                 placeholder="Ex: Frontend"
-                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                [class.border-red-500]="categoryForm.controls.name.touched && categoryForm.controls.name.invalid"
+                [class]="categoryNameInputClass()"
               />
-              @if (categoryForm.controls.name.touched && categoryForm.controls.name.invalid) {
-                <p class="mt-1 text-sm text-red-600">
-                  @if (categoryForm.controls.name.errors?.['required']) {
-                    Le nom est requis
-                  }
-                  @if (categoryForm.controls.name.errors?.['minlength']) {
-                    Minimum 2 caractères
-                  }
-                </p>
+              @if (categoryNameError()) {
+                <p class="mt-1 text-sm text-red-600">{{ categoryNameError() }}</p>
               }
             </div>
 
@@ -137,18 +129,10 @@
                 id="tagName"
                 formControlName="name"
                 placeholder="Ex: Angular"
-                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                [class.border-red-500]="tagForm.controls.name.touched && tagForm.controls.name.invalid"
+                [class]="tagNameInputClass()"
               />
-              @if (tagForm.controls.name.touched && tagForm.controls.name.invalid) {
-                <p class="mt-1 text-sm text-red-600">
-                  @if (tagForm.controls.name.errors?.['required']) {
-                    Le nom est requis
-                  }
-                  @if (tagForm.controls.name.errors?.['minlength']) {
-                    Minimum 2 caractères
-                  }
-                </p>
+              @if (tagNameError()) {
+                <p class="mt-1 text-sm text-red-600">{{ tagNameError() }}</p>
               }
             </div>
 

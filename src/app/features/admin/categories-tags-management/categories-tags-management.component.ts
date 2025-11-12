@@ -47,6 +47,49 @@ export class CategoriesTagsManagementComponent implements OnInit {
     return tag ? `Êtes-vous sûr de vouloir supprimer le tag "${tag.name}" ?` : '';
   });
 
+  // Form validation helpers
+  protected readonly categoryNameError = computed(() => {
+    const control = this.categoryForm.controls.name;
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Le nom est requis';
+    }
+    if (control.errors?.['minlength']) {
+      return 'Minimum 2 caractères';
+    }
+    return null;
+  });
+
+  protected readonly tagNameError = computed(() => {
+    const control = this.tagForm.controls.name;
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Le nom est requis';
+    }
+    if (control.errors?.['minlength']) {
+      return 'Minimum 2 caractères';
+    }
+    return null;
+  });
+
+  protected categoryNameInputClass(): string {
+    const control = this.categoryForm.controls.name;
+    return control.touched && control.invalid
+      ? 'block w-full px-4 py-3 border border-red-500 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500'
+      : 'block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500';
+  }
+
+  protected tagNameInputClass(): string {
+    const control = this.tagForm.controls.name;
+    return control.touched && control.invalid
+      ? 'block w-full px-4 py-3 border border-red-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+      : 'block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+  }
+
   public ngOnInit(): void {
     this.categoriesStore.loadCategories();
     this.tagsStore.loadTags();

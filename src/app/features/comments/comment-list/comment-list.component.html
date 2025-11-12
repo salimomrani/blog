@@ -36,7 +36,7 @@
   }
 
   <!-- Empty State -->
-  @if (!commentsStore.isLoading() && !commentsStore.hasComments()) {
+  @if (showEmptyState()) {
     <div class="text-center py-12 bg-gray-50 rounded-lg">
       <svg class="mx-auto h-16 w-16 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -47,7 +47,7 @@
   }
 
   <!-- Comments List -->
-  @if (!commentsStore.isLoading() && commentsStore.hasComments()) {
+  @if (showCommentsList()) {
     <div class="space-y-4">
       @for (comment of commentsStore.nestedComments(); track comment.id) {
         <ng-template #commentTemplate let-comment="comment">
@@ -95,7 +95,7 @@
                     Répondre
                   </button>
                 }
-                @if (authStore.isAuthenticated() && isCommentAuthor(comment.author.id)) {
+                @if (canDeleteComment(comment)) {
                   <button
                     (click)="deleteComment(comment.id)"
                     class="text-red-600 hover:text-red-800 transition duration-150"
@@ -128,11 +128,11 @@
             }
 
             <!-- Nested Replies -->
-            @if (comment.replies && comment.replies.length > 0) {
+            @if (hasReplies(comment)) {
               <div class="ml-8 mt-4 space-y-4">
                 @if (!shouldShowReplies(comment.id)) {
                   <button (click)="toggleShowReplies(comment.id)" class="text-blue-600 hover:underline text-sm">
-                    Afficher {{ comment.replies.length }} réponses
+                    Afficher {{ comment.replies!.length }} réponses
                   </button>
                 } @else {
                   <button (click)="toggleShowReplies(comment.id)" class="text-blue-600 hover:underline text-sm">

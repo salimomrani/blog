@@ -32,21 +32,10 @@
             id="title"
             formControlName="title"
             placeholder="Ex: Introduction à Angular 20"
-            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150"
-            [class.border-red-500]="form.controls.title.touched && form.controls.title.invalid"
+            [class]="getTitleInputClass()"
           />
-          @if (form.controls.title.touched && form.controls.title.invalid) {
-            <p class="mt-2 text-sm text-red-600">
-              @if (form.controls.title.errors?.['required']) {
-                Le titre est requis
-              }
-              @if (form.controls.title.errors?.['minlength']) {
-                Minimum 5 caractères
-              }
-              @if (form.controls.title.errors?.['maxlength']) {
-                Maximum 200 caractères
-              }
-            </p>
+          @if (getTitleError()) {
+            <p class="mt-2 text-sm text-red-600">{{ getTitleError() }}</p>
           }
         </div>
 
@@ -77,18 +66,10 @@ const hello = 'world';
 \`\`\`
 
 [Lien](https://exemple.com)"
-                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 font-mono text-sm resize-none"
-                [class.border-red-500]="form.controls.content.touched && form.controls.content.invalid"
+                [class]="getContentTextareaClass()"
               ></textarea>
-              @if (form.controls.content.touched && form.controls.content.invalid) {
-                <p class="mt-2 text-sm text-red-600">
-                  @if (form.controls.content.errors?.['required']) {
-                    Le contenu est requis
-                  }
-                  @if (form.controls.content.errors?.['minlength']) {
-                    Minimum 10 caractères
-                  }
-                </p>
+              @if (getContentError()) {
+                <p class="mt-2 text-sm text-red-600">{{ getContentError() }}</p>
               }
             </div>
 
@@ -125,14 +106,7 @@ const hello = 'world';
                 <button
                   type="button"
                   (click)="toggleCategory(category.id)"
-                  class="px-4 py-2 rounded-lg border-2 transition duration-150"
-                  [class.bg-purple-100]="isCategorySelected(category.id)"
-                  [class.border-purple-600]="isCategorySelected(category.id)"
-                  [class.text-purple-700]="isCategorySelected(category.id)"
-                  [class.bg-white]="!isCategorySelected(category.id)"
-                  [class.border-gray-300]="!isCategorySelected(category.id)"
-                  [class.text-gray-700]="!isCategorySelected(category.id)"
-                  [class.hover:border-purple-400]="!isCategorySelected(category.id)"
+                  [class]="getCategoryButtonClass(category.id)"
                 >
                   {{ category.name }}
                 </button>
@@ -162,14 +136,7 @@ const hello = 'world';
                 <button
                   type="button"
                   (click)="toggleTag(tag.id)"
-                  class="px-3 py-1 rounded-full border-2 text-sm transition duration-150"
-                  [class.bg-blue-100]="isTagSelected(tag.id)"
-                  [class.border-blue-600]="isTagSelected(tag.id)"
-                  [class.text-blue-700]="isTagSelected(tag.id)"
-                  [class.bg-white]="!isTagSelected(tag.id)"
-                  [class.border-gray-300]="!isTagSelected(tag.id)"
-                  [class.text-gray-700]="!isTagSelected(tag.id)"
-                  [class.hover:border-blue-400]="!isTagSelected(tag.id)"
+                  [class]="getTagButtonClass(tag.id)"
                 >
                   #{{ tag.name }}
                 </button>
