@@ -91,6 +91,67 @@ export class ArticleFormComponent implements OnInit {
     return this.form.controls.tagIds.value.includes(tagId);
   }
 
+  // CSS class helpers
+  protected getCategoryButtonClass(categoryId: number): string {
+    const isSelected = this.isCategorySelected(categoryId);
+    return isSelected
+      ? 'px-4 py-2 rounded-lg border-2 transition duration-150 bg-purple-100 border-purple-600 text-purple-700'
+      : 'px-4 py-2 rounded-lg border-2 transition duration-150 bg-white border-gray-300 text-gray-700 hover:border-purple-400';
+  }
+
+  protected getTagButtonClass(tagId: number): string {
+    const isSelected = this.isTagSelected(tagId);
+    return isSelected
+      ? 'px-3 py-1 rounded-full border-2 text-sm transition duration-150 bg-blue-100 border-blue-600 text-blue-700'
+      : 'px-3 py-1 rounded-full border-2 text-sm transition duration-150 bg-white border-gray-300 text-gray-700 hover:border-blue-400';
+  }
+
+  protected getTitleInputClass(): string {
+    const control = this.form.controls.title;
+    return control.touched && control.invalid
+      ? 'block w-full px-4 py-3 border border-red-500 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150'
+      : 'block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150';
+  }
+
+  protected getContentTextareaClass(): string {
+    const control = this.form.controls.content;
+    return control.touched && control.invalid
+      ? 'block w-full px-4 py-3 border border-red-500 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 font-mono text-sm resize-none'
+      : 'block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 font-mono text-sm resize-none';
+  }
+
+  // Validation error messages
+  protected getTitleError(): string | null {
+    const control = this.form.controls.title;
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Le titre est requis';
+    }
+    if (control.errors?.['minlength']) {
+      return 'Minimum 5 caractères';
+    }
+    if (control.errors?.['maxlength']) {
+      return 'Maximum 200 caractères';
+    }
+    return null;
+  }
+
+  protected getContentError(): string | null {
+    const control = this.form.controls.content;
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Le contenu est requis';
+    }
+    if (control.errors?.['minlength']) {
+      return 'Minimum 10 caractères';
+    }
+    return null;
+  }
+
   protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();

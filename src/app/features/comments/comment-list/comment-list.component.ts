@@ -80,4 +80,21 @@ export class CommentListComponent implements OnInit {
   public trackByComment(index: number, comment: CommentDto): number {
     return comment.id;
   }
+
+  // Helper methods for template complexity reduction
+  protected hasReplies(comment: CommentDto): boolean {
+    return !!(comment.replies && comment.replies.length > 0);
+  }
+
+  protected canDeleteComment(comment: CommentDto): boolean {
+    return this.authStore.isAuthenticated() && this.isCommentAuthor(comment.author.id);
+  }
+
+  protected showEmptyState(): boolean {
+    return !this.commentsStore.isLoading() && !this.commentsStore.hasComments();
+  }
+
+  protected showCommentsList(): boolean {
+    return !this.commentsStore.isLoading() && this.commentsStore.hasComments();
+  }
 }

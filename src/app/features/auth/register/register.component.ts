@@ -46,6 +46,60 @@ export class RegisterComponent {
     }
   });
 
+  // Helper methods for CSS classes
+  protected getInputClass(controlName: 'firstName' | 'lastName' | 'email' | 'password' | 'confirmPassword'): string {
+    const control = this.form.controls[controlName];
+    const isInvalid = control.touched && control.invalid;
+    const isPasswordMismatch = controlName === 'confirmPassword' && this.form.errors?.['passwordMismatch'];
+
+    return (isInvalid || isPasswordMismatch)
+      ? 'block w-full pl-10 pr-3 py-3 border border-red-500 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150'
+      : 'block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150';
+  }
+
+  // Helper methods for error messages
+  protected getFirstNameError(): string | null {
+    const control = this.form.controls.firstName;
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Le prénom est requis';
+    }
+    if (control.errors?.['minlength']) {
+      return 'Min. 2 caractères';
+    }
+    return null;
+  }
+
+  protected getLastNameError(): string | null {
+    const control = this.form.controls.lastName;
+    if (!control.touched || !control.invalid) {
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Le nom est requis';
+    }
+    if (control.errors?.['minlength']) {
+      return 'Min. 2 caractères';
+    }
+    return null;
+  }
+
+  protected getConfirmPasswordError(): string | null {
+    const control = this.form.controls.confirmPassword;
+    if (!control.touched || !control.invalid) {
+      if (this.form.touched && this.form.errors?.['passwordMismatch']) {
+        return 'Les mots de passe ne correspondent pas';
+      }
+      return null;
+    }
+    if (control.errors?.['required']) {
+      return 'Confirmation requise';
+    }
+    return null;
+  }
+
   public submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
