@@ -4,6 +4,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ArticlesStore } from '../../../store/articles.store';
 import { AuthFacade } from '../../../store/auth/auth.facade';
+import { ExportService } from '../../../services/export.service';
+import { AnalyticsService } from '../../../services/analytics.service';
 import { IsAuthorPipe } from '../../../shared/pipes/is-author.pipe';
 import { MarkdownPipe } from '../../../shared/pipes/markdown.pipe';
 import { CommentListComponent } from '../../comments/comment-list/comment-list.component';
@@ -25,12 +27,15 @@ export class ArticleDetailComponent implements OnInit {
   readonly authFacade = inject(AuthFacade);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly exportService = inject(ExportService);
+  private readonly analyticsService = inject(AnalyticsService);
 
   // Signal version of auth state (converted from observable)
   readonly user = toSignal(this.authFacade.user$, { initialValue: null });
   readonly isAuthenticated = toSignal(this.authFacade.isAuthenticated$, { initialValue: false });
 
   protected readonly showDeleteDialog = signal(false);
+  protected readonly isExporting = signal(false);
 
   public ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -59,5 +64,40 @@ export class ArticleDetailComponent implements OnInit {
 
   protected getArticleUrl(): string {
     return window.location.href;
+  }
+
+  /**
+   * Export current article to PDF
+   * Calls backend to generate PDF and triggers browser download
+   */
+  protected onExportToPdf(): void {
+    const article = this.articlesStore.selectedArticle();
+    if (!article) {
+      return;
+    }
+
+    this.isExporting.set(true);
+
+    this.exportService.exportArticleToPdf(article.id).subscribe({
+      next: (blob) => {
+        // Generate filename from article title
+        const filename = this.exportService.generatePdfFilename(article.id, article.title);
+
+        // Trigger browser download
+        this.exportService.downloadFile(blob, filename);
+
+        // Track export event in Google Analytics
+        this.analyticsService.trackEvent('article_export_pdf', 'content', String(article.id));
+
+        this.isExporting.set(false);
+      },
+      error: (error) => {
+        console.error('Error exporting article to PDF:', error);
+
+        // TODO: Show error notification to user
+        // For now, just log and reset loading state
+        this.isExporting.set(false);
+      }
+    });
   }
 }
