@@ -21,17 +21,27 @@ import { forbiddenInterceptor } from './interceptors/forbidden.interceptor';
 import { tokenRefreshInterceptor } from './interceptors/token-refresh.interceptor';
 import { authReducer } from './store/auth';
 import { AuthEffects } from './store/auth';
+import { StorageService } from './services/storage.service';
 import * as authActions from './store/auth/auth.actions';
 
 /**
  * Initialize authentication before app starts
- * Loads tokens from storage and dispatches loadUserProfile if token exists
+ * Loads tokens from storage and dispatches loadUserProfile only if token exists
  */
 export function initializeAuth() {
   return () => {
     const store = inject(Store);
+    const storageService = inject(StorageService);
+
+    // Always dispatch initializeAuth to load tokens from storage
     store.dispatch(authActions.initializeAuth());
-    store.dispatch(authActions.loadUserProfile());
+
+    // Only load user profile if we have an access token
+    // This avoids unnecessary API calls on auth routes or when user is logged out
+    const accessToken = storageService.getAccessToken();
+    if (accessToken) {
+      store.dispatch(authActions.loadUserProfile());
+    }
   };
 }
 
