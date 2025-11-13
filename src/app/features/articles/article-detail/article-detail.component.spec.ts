@@ -7,12 +7,16 @@ import { ArticlesStore } from '../../../store/articles.store';
 import { AuthFacade } from '../../../store/auth/auth.facade';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
+import { ExportService } from '../../../services/export.service';
+import { AnalyticsService } from '../../../services/analytics.service';
 
 describe('ArticleDetailComponent', () => {
   let component: ArticleDetailComponent;
   let fixture: ComponentFixture<ArticleDetailComponent>;
   let mockStore: Partial<ArticlesStore>;
   let mockAuthFacade: Partial<AuthFacade>;
+  let mockExportService: Partial<ExportService>;
+  let mockAnalyticsService: Partial<AnalyticsService>;
 
   beforeEach(async () => {
     mockStore = {
@@ -29,11 +33,23 @@ describe('ArticleDetailComponent', () => {
       user$: of(null)
     };
 
+    mockExportService = {
+      exportArticleToPdf: jest.fn().mockReturnValue(of(new Blob())),
+      generatePdfFilename: jest.fn().mockReturnValue('article-1-test.pdf'),
+      downloadFile: jest.fn()
+    };
+
+    mockAnalyticsService = {
+      trackEvent: jest.fn()
+    };
+
     await TestBed.configureTestingModule({
       imports: [ArticleDetailComponent, RouterTestingModule],
       providers: [
         { provide: ArticlesStore, useValue: mockStore },
         { provide: AuthFacade, useValue: mockAuthFacade },
+        { provide: ExportService, useValue: mockExportService },
+        { provide: AnalyticsService, useValue: mockAnalyticsService },
         {
           provide: ActivatedRoute,
           useValue: {
