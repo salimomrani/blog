@@ -4,7 +4,8 @@ export const environment = {
   apiPrefix: '/api/v1',
   get baseApiUrl(): string {
     return `${this.baseUrl}${this.apiPrefix}`;
-  }
+  },
+  googleAnalyticsId: 'G-78S15VXPSW'
 };
 
 

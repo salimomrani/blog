@@ -37,6 +37,7 @@
     "@ngrx/store": "^20.1.0",
     "@ngrx/store-devtools": "^20.1.0",
     "marked": "^16.4.2",
+    "ngx-google-analytics": "^14.0.1",
     "ngx-markdown": "^20.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
