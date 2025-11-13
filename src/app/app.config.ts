@@ -9,6 +9,11 @@ import { provideEffects } from '@ngrx/effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideMarkdown } from 'ngx-markdown';
 import { Store } from '@ngrx/store';
+import {
+  NGX_GOOGLE_ANALYTICS_SETTINGS_TOKEN,
+  NGX_GOOGLE_ANALYTICS_INITIALIZER_PROVIDER
+} from 'ngx-google-analytics';
+import { environment } from '../environments/environment';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
@@ -49,5 +54,16 @@ export const appConfig: ApplicationConfig = {
     }),
     provideMarkdown(),
     provideAppInitializer(initializeAuth()),
+    // Google Analytics 4 - only enabled if Measurement ID is configured
+    ...(environment.googleAnalyticsId ? [
+      {
+        provide: NGX_GOOGLE_ANALYTICS_SETTINGS_TOKEN,
+        useValue: {
+          trackingCode: environment.googleAnalyticsId,
+          isEnabled: true
+        }
+      },
+      NGX_GOOGLE_ANALYTICS_INITIALIZER_PROVIDER
+    ] : [])
   ]
 };

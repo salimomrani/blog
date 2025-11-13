@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 import { StorageService } from '../../services/storage.service';
+import { AnalyticsService } from '../../services/analytics.service';
 import * as authActions from './auth.actions';
 
 @Injectable()
@@ -13,6 +14,7 @@ export class AuthEffects {
   private readonly authService = inject(AuthService);
   private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
+  private readonly analyticsService = inject(AnalyticsService);
 
   // Initialize Auth - Load tokens from storage
   initializeAuth$ = createEffect(() =>
@@ -152,6 +154,7 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(authActions.loginSuccess),
         tap(() => {
+          this.analyticsService.trackLogin('email');
           this.router.navigate(['/home']);
         })
       ),
@@ -164,6 +167,7 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(authActions.registerSuccess),
         tap(() => {
+          this.analyticsService.trackSignUp('email');
           this.router.navigate(['/home']);
         })
       ),
@@ -176,6 +180,7 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(authActions.logoutSuccess, authActions.logoutFailure),
         tap(() => {
+          this.analyticsService.trackLogout();
           this.router.navigate(['/auth/login']);
         })
       ),

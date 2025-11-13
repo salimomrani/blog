@@ -6,6 +6,7 @@ import { computed } from '@angular/core';
 import { ArticleDto, CreateArticleRequest, UpdateArticleRequest } from '../models/article.model';
 import { ArticlesService, ArticleSearchParams } from '../services/articles.service';
 import { LikesService } from '../services/likes.service';
+import { AnalyticsService } from '../services/analytics.service';
 
 export interface ArticlesState {
   articles: ArticleDto[];
@@ -29,13 +30,14 @@ export const ArticlesStore = signalStore(
   withState(initialState),
   withProps(() => ({
     articlesService: inject(ArticlesService),
-    likesService: inject(LikesService)
+    likesService: inject(LikesService),
+    analyticsService: inject(AnalyticsService)
   })),
   withComputed((state) => ({
     articlesCount: computed(() => state.articles().length),
     hasArticles: computed(() => state.articles().length > 0)
   })),
-  withMethods(({ articlesService, likesService, ...store }) => ({
+  withMethods(({ articlesService, likesService, analyticsService, ...store }) => ({
     /**
      * Load all articles
      */
@@ -101,6 +103,8 @@ export const ArticlesStore = signalStore(
                 selectedArticle: response.data,
                 isLoading: false
               });
+              // Track article view
+              analyticsService.trackArticleView(response.data.id, response.data.title);
             } else {
               throw new Error(response.message);
             }
@@ -128,6 +132,8 @@ export const ArticlesStore = signalStore(
                 articles: [...currentArticles, response.data],
                 isLoading: false
               });
+              // Track article creation
+              analyticsService.trackArticleCreate(response.data.id, response.data.title);
             } else {
               throw new Error(response.message);
             }
@@ -279,6 +285,13 @@ export const ArticlesStore = signalStore(
                 articles: updatedArticles,
                 selectedArticle: updatedSelectedArticle
               });
+
+              // Track like/unlike event
+              if (isLiked) {
+                analyticsService.trackArticleUnlike(articleId);
+              } else {
+                analyticsService.trackArticleLike(articleId);
+              }
             }),
             catchError((error) => {
               const errorMessage = error?.error?.message ?? error?.message ?? 'Erreur lors de la mise à jour du like';
