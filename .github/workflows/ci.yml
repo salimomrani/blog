@@ -135,20 +135,27 @@ jobs:
           kops export kubeconfig --admin
           kubectl cluster-info
 
+      - name: Setup Kubernetes Infrastructure
+        run: |
+          echo "🏗️ Setting up NGINX Ingress + cert-manager..."
+          chmod +x scripts/setup-k8s-infrastructure.sh
+          ./scripts/setup-k8s-infrastructure.sh
+
       - name: Ensure Namespace Exists
         run: kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Apply cert-manager ClusterIssuer
+      - name: Deploy Application
         run: |
-          echo "🔐 Applying cert-manager ClusterIssuer..."
-          kubectl apply -f k8s/cert-manager.yaml
-
-      - name: Deploy to Kubernetes
-        run: |
-          echo "🚀 Applying Kubernetes manifests..."
+          echo "🚀 Deploying application (deployment + service)..."
           kubectl apply -f k8s/deployment.yaml
+
+      - name: Deploy Ingress
+        run: |
+          echo "🌐 Deploying ingress..."
           kubectl apply -f k8s/ingress.yaml
 
+      - name: Update Image to Specific SHA
+        run: |
           echo "🚀 Updating image to ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
           kubectl set image deployment/${{ env.NAMESPACE }} \
             ${{ env.NAMESPACE }}=${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
