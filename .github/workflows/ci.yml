@@ -135,14 +135,27 @@ jobs:
           kops export kubeconfig --admin
           kubectl cluster-info
 
+      - name: Setup Kubernetes Infrastructure
+        run: |
+          echo "🏗️ Setting up NGINX Ingress + cert-manager..."
+          chmod +x scripts/setup-k8s-infrastructure.sh
+          ./scripts/setup-k8s-infrastructure.sh
+
       - name: Ensure Namespace Exists
         run: kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Deploy to Kubernetes
+      - name: Deploy Application
         run: |
-          echo "🚀 Applying Kubernetes manifests..."
+          echo "🚀 Deploying application (deployment + service)..."
           kubectl apply -f k8s/deployment.yaml
 
+      - name: Deploy Ingress
+        run: |
+          echo "🌐 Deploying ingress..."
+          kubectl apply -f k8s/ingress.yaml
+
+      - name: Update Image to Specific SHA
+        run: |
           echo "🚀 Updating image to ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
           kubectl set image deployment/${{ env.NAMESPACE }} \
             ${{ env.NAMESPACE }}=${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
@@ -154,6 +167,14 @@ jobs:
       - name: Show Deployment Status
         if: always()
         run: |
+          echo "📦 Pods:"
           kubectl get pods -n ${{ env.NAMESPACE }} -o wide
+          echo ""
+          echo "🔌 Services:"
           kubectl get svc -n ${{ env.NAMESPACE }}
+          echo ""
+          echo "🌐 Ingress:"
           kubectl get ingress -n ${{ env.NAMESPACE }} || true
+          echo ""
+          echo "🔐 TLS Certificates:"
+          kubectl get certificate -n ${{ env.NAMESPACE }} || true

@@ -2,189 +2,156 @@
 
 ## Prerequisites
 
-1. Docker image built and pushed to a container registry
-2. Kubernetes cluster running (kops cluster configured)
-3. kubectl configured to access your cluster
-4. NGINX Ingress Controller installed in your cluster
+Before deploying the application, ensure your Kubernetes cluster has:
 
-## Quick Start
+1. **NGINX Ingress Controller**
+2. **cert-manager** (for automatic TLS certificates)
 
-### 1. Build and Push Docker Image
+## Installation Steps
 
-```bash
-# Build the Docker image
-docker build -t iconsultingdev/blog-frontend:latest .
-
-# Push to your registry (DockerHub)
-docker push iconsultingdev/blog-frontend:latest
-```
-
-**Docker Registry:** Using Docker Hub registry `iconsultingdev/blog-frontend:latest`
-
-### 2. Install NGINX Ingress Controller (if not already installed)
+### 1. Install NGINX Ingress Controller
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
+# Install using Helm
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --create-namespace \
+  --set controller.service.type=LoadBalancer
+
+# Verify installation
+kubectl get pods -n ingress-nginx
+kubectl get svc -n ingress-nginx
 ```
 
-### 3. Deploy the Application
+**Or using kubectl:**
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/aws/deploy.yaml
+```
+
+### 2. Install cert-manager
 
 ```bash
-# Apply all manifests
-kubectl apply -f k8s/
+# Install using kubectl
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.3/cert-manager.yaml
 
-# Or apply individually
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-kubectl apply -f k8s/ingress.yaml
+# Verify installation
+kubectl get pods -n cert-manager
 ```
 
-### 4. Verify Deployment
-
-```bash
-# Check pods
-kubectl get pods
-
-# Check service
-kubectl get svc
-
-# Check ingress
-kubectl get ingress
-
-# View logs
-kubectl logs -l app=blog-frontend
-```
-
-### 5. Access the Application
-
-The application will be accessible at: `http://blog.i-consulting.shop`
-
-Make sure your DNS is configured to point `blog.i-consulting.shop` to your ingress controller's external IP.
-
-```bash
-# Get ingress external IP
-kubectl get ingress blog-frontend-ingress
-```
-
-## Configuration Details
-
-### Deployment
-- **Replicas:** 2 pods for high availability
-- **Resources:**
-  - Requests: 128Mi memory, 100m CPU
-  - Limits: 256Mi memory, 200m CPU
-- **Health Checks:** Liveness and readiness probes configured
-
-### Service
-- **Type:** ClusterIP (internal only)
-- **Port:** 80
-
-### Ingress
-- **Host:** blog.i-consulting.shop
-- **Path:** / (root path)
-- **Backend:** blog-frontend-service on port 80
-
-## Useful Commands
-
-```bash
-# Update deployment after image change
-kubectl rollout restart deployment/blog-frontend
-
-# Scale deployment
-kubectl scale deployment/blog-frontend --replicas=3
-
-# View deployment status
-kubectl rollout status deployment/blog-frontend
-
-# Delete all resources
-kubectl delete -f k8s/
-```
-
-## Troubleshooting
-
-```bash
-# Check pod logs
-kubectl logs -l app=blog-frontend --tail=50
-
-# Describe pod for events
-kubectl describe pod -l app=blog-frontend
-
-# Check ingress controller logs
-kubectl logs -n ingress-nginx -l app.kubernetes.io/component=controller
-```
-
-## 🔐 SSL/TLS Configuration with Let's Encrypt
-
-### Prerequisites
-- Helm installed on your server
-- DNS configured: `blog.kubevpro.i-consulting.shop` → Ingress LoadBalancer IP
-
-### Automated Installation (Recommended)
-
-```bash
-# Upload k8s directory to your server
-scp -r k8s/ ubuntu@<your-server-ip>:~/
-
-# SSH to your server
-ssh ubuntu@<your-server-ip>
-
-# Run the automated setup script
-cd k8s
-chmod +x setup-ssl.sh
-./setup-ssl.sh
-```
-
-The script will:
-- ✅ Install cert-manager via Helm
-- ✅ Deploy Let's Encrypt ClusterIssuer
-- ✅ Configure Ingress with TLS
-- ✅ Wait for certificate issuance
-- ✅ Verify the setup
-
-Certificate will be automatically generated in 1-3 minutes.
-
-### Manual Installation (Alternative)
-
-#### 1. Install cert-manager
-
+**Or using Helm:**
 ```bash
 helm repo add jetstack https://charts.jetstack.io
 helm repo update
 helm install cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.14.0 \
   --set installCRDs=true
 ```
 
-#### 2. Deploy ClusterIssuer
+### 3. Apply cert-manager ClusterIssuer
 
 ```bash
-kubectl apply -f k8s/01-cluster-issuer-letsencrypt.yaml
+kubectl apply -f k8s/cert-manager.yaml
 ```
 
-#### 3. Deploy Ingress with TLS
+This creates two ClusterIssuers:
+- `letsencrypt-prod` - Production Let's Encrypt certificates
+- `letsencrypt-staging` - Staging certificates (for testing)
+
+### 4. Deploy the Application
 
 ```bash
+# Create namespace
+kubectl create namespace blog-frontend
+
+# Apply deployment and service
+kubectl apply -f k8s/deployment.yaml
+
+# Apply ingress
 kubectl apply -f k8s/ingress.yaml
 ```
 
-### Verify SSL
+### 5. Configure DNS
+
+Get the external IP of the NGINX Ingress Controller:
 
 ```bash
-# Check certificate status
-kubectl get certificate
-
-# Test HTTPS
-curl -I https://blog.kubevpro.i-consulting.shop
+kubectl get svc -n ingress-nginx
 ```
 
-**📚 Complete SSL Guide:** See `/docs/ssl-setup-guide.md` for detailed instructions.
+Create a DNS A record pointing to this IP:
+```
+blog.kubevpro.i-consulting.shop -> <EXTERNAL-IP>
+```
 
-## Notes
+### 6. Verify TLS Certificate
 
-- Docker Hub registry configured: `iconsultingdev/blog-frontend:latest`
-- The Ingress requires NGINX Ingress Controller to be installed
-- DNS must be configured to point your domain to the ingress external IP
-- **SSL/TLS** is configured with cert-manager and Let's Encrypt
-- Certificate auto-renewal is handled by cert-manager
+Check certificate status:
+
+```bash
+# Check certificate
+kubectl get certificate -n blog-frontend
+
+# Check certificate details
+kubectl describe certificate blog-frontend-tls -n blog-frontend
+
+# Check ingress
+kubectl get ingress -n blog-frontend
+```
+
+The certificate will be automatically issued by Let's Encrypt via cert-manager.
+
+## Accessing the Application
+
+Once deployed and DNS is configured:
+
+- **URL**: https://blog.kubevpro.i-consulting.shop
+- **Auto-redirect**: HTTP → HTTPS
+
+## Troubleshooting
+
+### Certificate not issuing
+
+```bash
+# Check cert-manager logs
+kubectl logs -n cert-manager -l app=cert-manager
+
+# Check certificate challenge
+kubectl get challenges -n blog-frontend
+
+# Check certificate orders
+kubectl get certificaterequest -n blog-frontend
+```
+
+### Ingress not working
+
+```bash
+# Check ingress controller logs
+kubectl logs -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx
+
+# Check ingress details
+kubectl describe ingress blog-frontend -n blog-frontend
+```
+
+### Test with staging first
+
+To avoid Let's Encrypt rate limits, test with staging issuer first:
+
+```yaml
+# In k8s/ingress.yaml, change:
+cert-manager.io/cluster-issuer: letsencrypt-staging
+```
+
+## Manual Deployment (without CI/CD)
+
+```bash
+# Apply all manifests
+kubectl apply -f k8s/cert-manager.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/ingress.yaml
+
+# Check status
+kubectl get all,ingress,certificate -n blog-frontend
+```

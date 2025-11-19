@@ -1,24 +1,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: blog-frontend-ingress
+  name: blog-frontend
   namespace: blog-frontend
   annotations:
-    # cert-manager will create the certificate automatically
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    # Force HTTPS redirect
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    # Enable SSL passthrough
+    # NGINX Ingress Controller annotations
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # Optional: Set proxy body size (for large uploads)
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
+    # cert-manager annotations for automatic certificate
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    
+    # Optional: increase body size for uploads
     nginx.ingress.kubernetes.io/proxy-body-size: "10m"
 spec:
-  ingressClassName: nginx
   tls:
   - hosts:
     - blog.kubevpro.i-consulting.shop
-    # Secret name where the certificate will be stored
-    secretName: blog-frontend-tls-cert
+    secretName: blog-frontend-tls
   rules:
   - host: blog.kubevpro.i-consulting.shop
     http:
@@ -27,6 +27,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: blog-frontend-service
+            name: blog-frontend
             port:
               number: 80
