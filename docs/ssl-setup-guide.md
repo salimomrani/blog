@@ -129,21 +129,26 @@ dig blog.kubevpro.i-consulting.shop
 
 ## 📦 Déploiement des ressources
 
-### Étape 1 : Mettre à jour l'email dans le ClusterIssuer
+### Étape 1 : Utiliser le script automatisé (Recommandé)
 
-Éditez le fichier `k8s/01-cluster-issuer-letsencrypt.yaml` et remplacez :
-
-```yaml
-email: contact@i-consulting.shop
+```bash
+# Installer NGINX Ingress + cert-manager + ClusterIssuer automatiquement
+./scripts/setup-k8s-infrastructure.sh
 ```
 
-Par votre **véritable adresse email**.
+Ce script va :
+- ✅ Installer NGINX Ingress Controller
+- ✅ Installer cert-manager
+- ✅ Déployer les ClusterIssuers (production + staging)
+- ✅ Vérifier que tout est prêt
 
-### Étape 2 : Déployer le ClusterIssuer Let's Encrypt
+### Étape 2 : Ou installation manuelle
+
+Si vous préférez installer manuellement :
 
 ```bash
 # Déployer le ClusterIssuer (production + staging)
-kubectl apply -f k8s/01-cluster-issuer-letsencrypt.yaml
+kubectl apply -f k8s/cert-manager.yaml
 
 # Vérifier que les issuers sont créés
 kubectl get clusterissuer
@@ -154,18 +159,26 @@ kubectl get clusterissuer
 # letsencrypt-staging   True    30s
 ```
 
-### Étape 3 : Déployer l'Ingress avec TLS
+**Note :** L'email est déjà configuré à `omrani_salim@outlook.fr` dans `k8s/cert-manager.yaml`
+
+### Étape 3 : Déployer l'application et l'Ingress
 
 ```bash
-# Appliquer la configuration Ingress avec TLS
+# Créer le namespace
+kubectl create namespace blog-frontend
+
+# Déployer l'application (deployment + service)
+kubectl apply -f k8s/deployment.yaml
+
+# Déployer l'Ingress avec TLS
 kubectl apply -f k8s/ingress.yaml
 
 # Vérifier l'Ingress
-kubectl get ingress
+kubectl get ingress -n blog-frontend
 
 # Sortie attendue :
-# NAME                     CLASS   HOSTS                              ADDRESS         PORTS     AGE
-# blog-frontend-ingress    nginx   blog.kubevpro.i-consulting.shop    <EXTERNAL-IP>   80, 443   1m
+# NAME             CLASS   HOSTS                              ADDRESS         PORTS     AGE
+# blog-frontend    nginx   blog.kubevpro.i-consulting.shop    <EXTERNAL-IP>   80, 443   1m
 ```
 
 ### Étape 4 : Attendre la génération du certificat
@@ -178,17 +191,17 @@ cert-manager va automatiquement :
 
 ```bash
 # Suivre la génération du certificat
-kubectl get certificate
+kubectl get certificate -n blog-frontend
 
 # Sortie attendue (après quelques minutes) :
-# NAME                    READY   SECRET                  AGE
-# blog-frontend-tls-cert  True    blog-frontend-tls-cert  2m
+# NAME                READY   SECRET              AGE
+# blog-frontend-tls   True    blog-frontend-tls   2m
 
 # Voir les détails du certificat
-kubectl describe certificate blog-frontend-tls-cert
+kubectl describe certificate blog-frontend-tls -n blog-frontend
 
 # Voir les challenges ACME (si problème)
-kubectl get challenges
+kubectl get challenges -n blog-frontend
 ```
 
 ⏰ **La génération du certificat prend 1-3 minutes** en général.
@@ -201,10 +214,10 @@ kubectl get challenges
 
 ```bash
 # Vérifier que le Secret TLS a été créé
-kubectl get secret blog-frontend-tls-cert
+kubectl get secret blog-frontend-tls -n blog-frontend
 
 # Voir les détails du secret
-kubectl describe secret blog-frontend-tls-cert
+kubectl describe secret blog-frontend-tls -n blog-frontend
 ```
 
 ### 2. Tester l'accès HTTPS
@@ -321,8 +334,8 @@ nginx.ingress.kubernetes.io/ssl-redirect: "true"
 **Solution :**
 ```bash
 # Supprimer le certificat staging
-kubectl delete certificate blog-frontend-tls-cert
-kubectl delete secret blog-frontend-tls-cert
+kubectl delete certificate blog-frontend-tls -n blog-frontend
+kubectl delete secret blog-frontend-tls -n blog-frontend
 
 # Mettre à jour l'Ingress pour utiliser prod
 kubectl apply -f k8s/ingress.yaml
@@ -341,7 +354,7 @@ cert-manager **renouvelle automatiquement** les certificats Let's Encrypt :
 Vérifier la date d'expiration :
 
 ```bash
-kubectl get certificate blog-frontend-tls-cert -o jsonpath='{.status.notAfter}'
+kubectl get certificate blog-frontend-tls -n blog-frontend -o jsonpath='{.status.notAfter}'
 ```
 
 ---

@@ -150,9 +150,9 @@ Avant de migrer, vérifier :
   gh secret list
   ```
 
-- [ ] Le script `setup-ssl.sh` existe et est exécutable
+- [ ] Le script `setup-k8s-infrastructure.sh` existe et est exécutable
   ```bash
-  ls -la scripts/setup-ssl.sh
+  ls -la scripts/setup-k8s-infrastructure.sh
   ```
 
 - [ ] Les manifests Kubernetes sont à jour

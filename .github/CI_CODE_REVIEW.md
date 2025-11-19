@@ -15,8 +15,9 @@
 - ✅ **AWS credentials** : Configuration sécurisée avec actions officielles
 
 ### Kubernetes
-- ✅ **Installation conditionnelle** : Ingress Controller installé seulement si nécessaire
-- ✅ **Script SSL automatisé** : Délégation à `setup-ssl.sh`
+- ✅ **Infrastructure automatisée** : NGINX Ingress + cert-manager via `setup-k8s-infrastructure.sh`
+- ✅ **Installation conditionnelle** : Vérification des composants avant installation
+- ✅ **Déploiement ordonné** : Infrastructure → Namespace → Application → Ingress
 - ✅ **Rollout status** : Vérification du déploiement avec timeout
 
 ---
