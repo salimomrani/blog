@@ -10,6 +10,11 @@ spec:
   selector:
     matchLabels:
       app: blog-frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -18,8 +23,11 @@ spec:
       containers:
       - name: blog-frontend
         image: iconsultingdev/blog-frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
+          name: http
+          protocol: TCP
         resources:
           requests:
             memory: "128Mi"
@@ -33,9 +41,30 @@ spec:
             port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /
             port: 80
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blog-frontend
+  namespace: blog-frontend
+  labels:
+    app: blog-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: blog-frontend
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
