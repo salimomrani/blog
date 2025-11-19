@@ -138,10 +138,16 @@ jobs:
       - name: Ensure Namespace Exists
         run: kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Apply cert-manager ClusterIssuer
+        run: |
+          echo "🔐 Applying cert-manager ClusterIssuer..."
+          kubectl apply -f k8s/cert-manager.yaml
+
       - name: Deploy to Kubernetes
         run: |
           echo "🚀 Applying Kubernetes manifests..."
           kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/ingress.yaml
 
           echo "🚀 Updating image to ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
           kubectl set image deployment/${{ env.NAMESPACE }} \
@@ -154,6 +160,14 @@ jobs:
       - name: Show Deployment Status
         if: always()
         run: |
+          echo "📦 Pods:"
           kubectl get pods -n ${{ env.NAMESPACE }} -o wide
+          echo ""
+          echo "🔌 Services:"
           kubectl get svc -n ${{ env.NAMESPACE }}
+          echo ""
+          echo "🌐 Ingress:"
           kubectl get ingress -n ${{ env.NAMESPACE }} || true
+          echo ""
+          echo "🔐 TLS Certificates:"
+          kubectl get certificate -n ${{ env.NAMESPACE }} || true
