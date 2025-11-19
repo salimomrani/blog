@@ -138,9 +138,12 @@ jobs:
       - name: Ensure Namespace Exists
         run: kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Deploy New Image
+      - name: Deploy to Kubernetes
         run: |
-          echo "🚀 Deploying ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
+          echo "🚀 Applying Kubernetes manifests..."
+          kubectl apply -f k8s/deployment.yaml
+
+          echo "🚀 Updating image to ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
           kubectl set image deployment/${{ env.NAMESPACE }} \
             ${{ env.NAMESPACE }}=${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
             -n ${{ env.NAMESPACE }}
